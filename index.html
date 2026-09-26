@@ -4,1547 +4,1180 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PadaTani - Platform Integrasi & Ekosistem Limbah Pertanian</title>
-    <!-- Google Fonts Poppins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+
     <!-- FontAwesome Icons CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Google Fonts Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#00A859',
-                        'emerald-dark': '#0B4127',
-                        'lime-accent': '#72D328',
-                        'soft-bg': '#F7FAF8',
-                        'slate-dark': '#1E293B',
-                        'slate-muted': '#64748B'
+                        brand: {
+                            50: '#eefef4',
+                            100: '#d7fce4',
+                            200: '#b2f7cd',
+                            300: '#79eeaa',
+                            400: '#3bdd7e',
+                            500: '#12c35f',
+                            600: '#00a859', // Primary PadaTani Green
+                            700: '#038148',
+                            800: '#08663b',
+                            900: '#095432',
+                            950: '#002f1a',
+                        }
                     },
                     fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'figma': '0px 10px 30px rgba(0, 168, 89, 0.08)',
-                        'card': '0px 4px 20px rgba(0, 0, 0, 0.05)',
-                        'float': '0px 12px 32px rgba(11, 65, 39, 0.15)'
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
-    
+
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #F7FAF8;
-            color: #1E293B;
-        }
-
-        .page-content {
-            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .active-indicator {
-            transition: all 0.3s ease;
-        }
-
-        /* Custom Toast Animation */
-        #toastContainer {
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        /* Glassmorphism background */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-
-        /* Custom Scrollbar */
+        /* Custom scrollbar styling */
         ::-webkit-scrollbar {
             width: 8px;
+            height: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #F1F5F9;
+            background: #f1f5f9;
         }
         ::-webkit-scrollbar-thumb {
-            background: #CBD5E1;
+            background: #cbd5e1;
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #00A859;
+            background: #94a3b8;
+        }
+
+        /* Float pulse animation for mascot */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .animate-float {
+            animation: floatSlow 3s ease-in-out infinite;
+        }
+
+        /* Gradient Glassmorphism */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-primary selection:text-white">
+<body class="font-sans bg-slate-50 text-slate-800 antialiased selection:bg-brand-500 selection:text-white relative">
 
-    <!-- CUSTOM TOAST NOTIFICATION CONTAINER -->
-    <div id="toastContainer" class="fixed top-24 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-    <!-- HEADER & NAVBAR -->
-    <header class="sticky top-0 z-40 bg-white border-b border-slate-100 shadow-sm">
-        <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Sticky Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
-                
-                <!-- Brand Logo & Tagline -->
-                <a href="javascript:void(0)" onclick="switchPage('page-home')" class="flex items-center gap-3.5 group">
-                    <div class="relative w-11 h-11 rounded-full bg-[#00A859] flex items-center justify-center shadow-md shadow-primary/20 group-hover:scale-105 transition-transform">
-                        <span class="text-white font-extrabold text-2xl tracking-tighter">P</span>
-                        <!-- Leaf curve overlay inside logo -->
-                        <svg class="absolute bottom-1 right-1 w-5 h-5 text-[#72D328]" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M17,8C8,10 5,16 3,21C8,21 15,18 19,12C20.5,9.7 20,8 17,8Z"/>
-                        </svg>
+                <!-- Brand Logo -->
+                <a href="#" class="flex items-center gap-3 group">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-700 to-brand-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform duration-300">
+                        <i class="fa-solid fa-leaf text-xl"></i>
                     </div>
-                    <div class="flex flex-col">
-                        <div class="flex items-center gap-1">
-                            <span class="text-2xl font-bold tracking-tight text-[#0B4127]">PadaTani</span>
-                            <span class="w-2 h-2 rounded-full bg-[#72D328] inline-block"></span>
-                        </div>
-                        <span class="text-[10px] font-semibold tracking-wider text-slate-500 uppercase -mt-1">BERSAMA TANI, BERSAMA UNTUNG</span>
+                    <div>
+                        <span class="text-2xl font-extrabold tracking-tight text-slate-900">Pada<span class="text-brand-600">Tani</span></span>
+                        <span class="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase -mt-1">Ekosistem Limbah Agrikultur</span>
                     </div>
                 </a>
 
-                <!-- Navigation Links (Centered) -->
-                <nav class="hidden lg:flex items-center space-x-7 text-[15px]">
-                    <button onclick="switchPage('page-home')" data-page="page-home" class="nav-link relative py-2 font-semibold text-[#00A859] transition-colors hover:text-primary">
-                        <span>Beranda</span>
-                        <div class="active-indicator absolute bottom-0 left-0 w-full h-[3px] bg-[#00A859] rounded-full"></div>
-                    </button>
-
-                    <button onclick="switchPage('page-platform')" data-page="page-platform" class="nav-link relative py-2 font-medium text-slate-600 transition-colors hover:text-primary">
-                        <span>Platform & Mutu</span>
-                        <div class="active-indicator hidden absolute bottom-0 left-0 w-full h-[3px] bg-[#00A859] rounded-full"></div>
-                    </button>
-
-                    <button onclick="switchPage('page-calculator')" data-page="page-calculator" class="nav-link relative py-2 font-medium text-slate-600 transition-colors hover:text-primary">
-                        <span>Kalkulator Potensi</span>
-                        <div class="active-indicator hidden absolute bottom-0 left-0 w-full h-[3px] bg-[#00A859] rounded-full"></div>
-                    </button>
-
-                    <button onclick="switchPage('page-passport')" data-page="page-passport" class="nav-link relative py-2 font-medium text-slate-600 transition-colors hover:text-primary">
-                        <span>Waste Passport</span>
-                        <div class="active-indicator hidden absolute bottom-0 left-0 w-full h-[3px] bg-[#00A859] rounded-full"></div>
-                    </button>
-
-                    <button onclick="switchPage('page-hubs')" data-page="page-hubs" class="nav-link relative py-2 font-medium text-slate-600 transition-colors hover:text-primary">
-                        <span>Agri Hubs</span>
-                        <div class="active-indicator hidden absolute bottom-0 left-0 w-full h-[3px] bg-[#00A859] rounded-full"></div>
-                    </button>
+                <!-- Desktop Navigation Menu -->
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="#alur-kerja" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Alur Kerja</a>
+                    <a href="#katalog" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Katalog Limbah</a>
+                    <a href="#paspor-digital" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Paspor Digital</a>
+                    <a href="#kalkulator" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Kalkulator Potensi</a>
+                    <a href="#agri-hubs" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Agri Hubs</a>
+                    <a href="#kemitraan" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Kemitraan</a>
                 </nav>
 
-                <!-- Action Buttons -->
-                <div class="hidden xl:flex items-center gap-3">
-                    <button onclick="switchPage('page-kemitraan'); setPartnershipTab('petani');" class="px-5 py-2.5 rounded-xl border-2 border-primary text-primary font-semibold text-sm hover:bg-primary/5 transition-all flex items-center gap-2">
-                        <i class="fa-solid fa-seedling text-primary"></i>
-                        <span>Mitra Petani</span>
-                    </button>
-
-                    <button onclick="switchPage('page-kemitraan'); setPartnershipTab('industri');" class="px-5 py-2.5 rounded-xl bg-primary hover:bg-[#00914d] text-white font-semibold text-sm shadow-md shadow-primary/25 transition-all flex items-center gap-2">
-                        <i class="fa-solid fa-building"></i>
-                        <span>Portal B2B Industry</span>
-                    </button>
+                <!-- Navigation CTAs -->
+                <div class="hidden md:flex items-center gap-3">
+                    <a href="#paspor-digital" class="px-4 py-2.5 rounded-xl text-sm font-bold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 transition-all duration-200">
+                        <i class="fa-solid fa-qrcode mr-2"></i>Cek Paspor
+                    </a>
+                    <a href="#kemitraan" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-lg shadow-brand-600/30 hover:shadow-brand-600/40 transition-all duration-200">
+                        Gabung Mitra
+                    </a>
                 </div>
 
-                <!-- Mobile Hamburger Toggle -->
-                <button onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none" aria-label="Menu">
-                    <i class="fa-solid fa-bars text-xl" id="menuIcon"></i>
+                <!-- Mobile Menu Toggle Button -->
+                <button id="mobile-menu-btn" type="button" class="md:hidden p-2.5 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors" aria-label="Buka Menu">
+                    <i class="fa-solid fa-bars text-xl"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Mobile Drawer Navigation -->
-        <div id="mobileMenu" class="hidden lg:hidden border-t border-slate-100 bg-white px-4 pt-3 pb-6 space-y-3">
-            <button onclick="switchPage('page-home'); toggleMobileMenu()" class="w-full text-left px-3 py-2 text-slate-700 font-medium hover:bg-emerald-50 rounded-lg">Beranda</button>
-            <button onclick="switchPage('page-platform'); toggleMobileMenu()" class="w-full text-left px-3 py-2 text-slate-700 font-medium hover:bg-emerald-50 rounded-lg">Platform & Mutu</button>
-            <button onclick="switchPage('page-calculator'); toggleMobileMenu()" class="w-full text-left px-3 py-2 text-slate-700 font-medium hover:bg-emerald-50 rounded-lg">Kalkulator Potensi</button>
-            <button onclick="switchPage('page-passport'); toggleMobileMenu()" class="w-full text-left px-3 py-2 text-slate-700 font-medium hover:bg-emerald-50 rounded-lg">Waste Passport</button>
-            <button onclick="switchPage('page-hubs'); toggleMobileMenu()" class="w-full text-left px-3 py-2 text-slate-700 font-medium hover:bg-emerald-50 rounded-lg">Agri Hubs</button>
-            
-            <div class="pt-3 border-t border-slate-100 flex flex-col gap-2">
-                <button onclick="switchPage('page-kemitraan'); setPartnershipTab('petani'); toggleMobileMenu()" class="w-full py-2.5 text-center border-2 border-primary text-primary font-semibold rounded-xl">
-                    Mitra Petani
-                </button>
-                <button onclick="switchPage('page-kemitraan'); setPartnershipTab('industri'); toggleMobileMenu()" class="w-full py-2.5 text-center bg-primary text-white font-semibold rounded-xl">
-                    Portal B2B Industry
-                </button>
+        <!-- Mobile Dropdown Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden border-b border-slate-200 bg-white px-4 pt-3 pb-6 space-y-3">
+            <a href="#alur-kerja" class="mobile-link block px-3 py-2 rounded-lg font-semibold text-slate-700 hover:bg-slate-100">Alur Kerja</a>
+            <a href="#katalog" class="mobile-link block px-3 py-2 rounded-lg font-semibold text-slate-700 hover:bg-slate-100">Katalog Limbah</a>
+            <a href="#paspor-digital" class="mobile-link block px-3 py-2 rounded-lg font-semibold text-slate-700 hover:bg-slate-100">Paspor Digital</a>
+            <a href="#kalkulator" class="mobile-link block px-3 py-2 rounded-lg font-semibold text-slate-700 hover:bg-slate-100">Kalkulator Potensi</a>
+            <a href="#agri-hubs" class="mobile-link block px-3 py-2 rounded-lg font-semibold text-slate-700 hover:bg-slate-100">Agri Hubs</a>
+            <a href="#kemitraan" class="mobile-link block px-3 py-2 rounded-lg font-semibold text-slate-700 hover:bg-slate-100">Kemitraan</a>
+            <div class="pt-2 flex flex-col gap-2">
+                <a href="#paspor-digital" class="mobile-link w-full text-center px-4 py-2.5 rounded-xl font-bold text-brand-700 bg-brand-50 border border-brand-200">
+                    Cek Paspor Limbah
+                </a>
+                <a href="#kemitraan" class="mobile-link w-full text-center px-4 py-2.5 rounded-xl font-bold text-white bg-brand-600">
+                    Daftar Kemitraan
+                </a>
             </div>
         </div>
     </header>
 
-    <!-- MAIN CONTENT CONTAINER WITH SPA PAGES -->
-    <main class="flex-grow">
+    <!-- Hero Section -->
+    <section class="relative pt-12 pb-20 lg:pt-20 lg:pb-28 overflow-hidden bg-gradient-to-b from-brand-50/60 via-slate-50 to-slate-50">
+        <!-- Decorative Background Elements -->
+        <div class="absolute top-1/4 -left-20 w-80 h-80 bg-brand-200/40 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/3 right-0 w-96 h-96 bg-emerald-300/30 rounded-full blur-3xl pointer-events-none"></div>
 
-        <!-- ================= PAGE 1: BERANDA ================= -->
-        <section id="page-home" class="page-content">
-            <!-- Hero Section -->
-            <div class="relative bg-gradient-to-b from-white via-soft-bg to-emerald-50/40 py-16 lg:py-24 overflow-hidden border-b border-slate-100">
-                <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                        
-                        <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
-                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/70 border border-emerald-200 text-emerald-800 text-xs font-semibold uppercase tracking-wider">
-                                <i class="fa-solid fa-leaf text-primary"></i>
-                                Platform Sirkularitas Limbah Pertanian #1 Indonesia
-                            </div>
-                            
-                            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-emerald-dark leading-tight">
-                                Mengubah Limbah Pertanian Menjadi <span class="text-primary underline decoration-lime-accent decoration-wavy decoration-2">Nilai Ekonomi</span> & Energi Berkelanjutan
-                            </h1>
-                            
-                            <p class="text-slate-600 text-base sm:text-lg max-w-2xl font-normal leading-relaxed">
-                                PadaTani menghubungkan Kelompok Tani (Gapoktan) dengan Industri Off-taker Energi Biomassa, Biochar, dan Pakan Ternak melalui rantai pasok terverifikasi digital.
-                            </p>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+                <!-- Hero Left Content -->
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-100 border border-brand-200 text-brand-800 text-xs sm:text-sm font-bold shadow-xs">
+                        <span class="w-2 h-2 rounded-full bg-brand-600 animate-pulse"></span>
+                        Platform Integrasi Limbah Biomassa No. 1 di Indonesia
+                    </div>
+                    
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
+                        Ubah Limbah Pertanian Menjadi <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 via-emerald-600 to-teal-600">Komoditas Berdaya Saing</span>
+                    </h1>
 
-                            <div class="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                                <button onclick="switchPage('page-calculator')" class="w-full sm:w-auto px-7 py-3.5 bg-primary hover:bg-[#00914d] text-white font-semibold rounded-xl shadow-lg shadow-primary/30 transition-all flex items-center justify-center gap-3">
-                                    <span>Hitung Potensi Limbah Anda</span>
-                                    <i class="fa-solid fa-calculator"></i>
-                                </button>
-                                
-                                <button onclick="switchPage('page-platform')" class="w-full sm:w-auto px-7 py-3.5 bg-white border border-slate-200 hover:border-primary text-slate-700 font-semibold rounded-xl shadow-sm transition-all flex items-center justify-center gap-2">
-                                    <span>Jelajahi Solusi Platform</span>
-                                    <i class="fa-solid fa-arrow-right text-primary"></i>
-                                </button>
-                            </div>
+                    <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
+                        PadaTani menghubungkan petani, kelompok tani, dan hub pengolah limbah dengan pembeli industri B2B secara terstruktur, terstandarisasi, dan terverifikasi via <strong class="text-slate-800 font-semibold">Digital Waste Passport</strong>.
+                    </p>
 
-                            <!-- Live Stats -->
-                            <div class="pt-8 border-t border-slate-200/60 grid grid-cols-3 gap-4">
-                                <div>
-                                    <p class="text-2xl sm:text-3xl font-extrabold text-emerald-dark">142k+</p>
-                                    <p class="text-xs sm:text-sm text-slate-500 font-medium">Ton Limbah Terolah</p>
-                                </div>
-                                <div>
-                                    <p class="text-2xl sm:text-3xl font-extrabold text-primary">Rp 38.4 M</p>
-                                    <p class="text-xs sm:text-sm text-slate-500 font-medium">Pendapatan Petani</p>
-                                </div>
-                                <div>
-                                    <p class="text-2xl sm:text-3xl font-extrabold text-emerald-dark">198k</p>
-                                    <p class="text-xs sm:text-sm text-slate-500 font-medium">Ton CO2e Reduksi</p>
-                                </div>
-                            </div>
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                        <a href="#kalkulator" class="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-xl shadow-brand-600/30 hover:shadow-brand-600/40 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-calculator text-lg"></i> Hitung Potensi Limbah
+                        </a>
+                        <a href="#paspor-digital" class="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 shadow-sm hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-shield-halved text-brand-600 text-lg"></i> Cek Paspor Digital
+                        </a>
+                    </div>
+
+                    <!-- Trust Stats Counter Grid -->
+                    <div class="grid grid-cols-3 gap-4 pt-8 border-t border-slate-200/80">
+                        <div>
+                            <p class="text-2xl sm:text-3xl font-extrabold text-slate-900">12.500+</p>
+                            <p class="text-xs sm:text-sm font-medium text-slate-500">Ton Limbah Terolah</p>
                         </div>
+                        <div>
+                            <p class="text-2xl sm:text-3xl font-extrabold text-brand-600">4.800+</p>
+                            <p class="text-xs sm:text-sm font-medium text-slate-500">Mitra Petani & Poktan</p>
+                        </div>
+                        <div>
+                            <p class="text-2xl sm:text-3xl font-extrabold text-slate-900">18.2 Ton</p>
+                            <p class="text-xs sm:text-sm font-medium text-slate-500">Reduksi Emisi CO₂e</p>
+                        </div>
+                    </div>
+                </div>
 
-                        <div class="lg:col-span-5">
-                            <div class="relative mx-auto max-w-md lg:max-w-none">
-                                <!-- Card Preview Hero Image Visual -->
-                                <div class="bg-white rounded-2xl p-6 shadow-figma border border-slate-100 space-y-5">
-                                    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-primary flex items-center justify-center font-bold">
-                                                <i class="fa-solid fa-shield-halved text-lg"></i>
-                                            </div>
-                                            <div>
-                                                <h4 class="font-bold text-slate-800 text-sm">Waste Passport Digital</h4>
-                                                <p class="text-xs text-slate-500">Batch #BATCH-2026-JATIM-089</p>
-                                            </div>
-                                        </div>
-                                        <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-primary">Terverifikasi</span>
+                <!-- Hero Right Interactive Card Graphic -->
+                <div class="lg:col-span-5">
+                    <div class="relative mx-auto max-w-md lg:max-w-none">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-brand-500 to-teal-500 rounded-3xl blur-xl opacity-30 animate-pulse"></div>
+                        <div class="relative bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200/80 space-y-6">
+                            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center text-brand-600">
+                                        <i class="fa-solid fa-seedling text-lg"></i>
                                     </div>
-
-                                    <div class="space-y-3">
-                                        <div class="flex justify-between text-xs">
-                                            <span class="text-slate-500">Komoditas:</span>
-                                            <span class="font-semibold text-slate-800">Sekam & Jerami Padi</span>
-                                        </div>
-                                        <div class="flex justify-between text-xs">
-                                            <span class="text-slate-500">Asal Hub:</span>
-                                            <span class="font-semibold text-slate-800">Agri Hub Malang - Jawa Timur</span>
-                                        </div>
-                                        <div class="flex justify-between text-xs">
-                                            <span class="text-slate-500">Nilai Kalor Teruji:</span>
-                                            <span class="font-semibold text-primary">16.4 MJ/kg</span>
-                                        </div>
-                                        <div class="flex justify-between text-xs">
-                                            <span class="text-slate-500">Kadar Air (Moisture):</span>
-                                            <span class="font-semibold text-slate-800">11.8% (Standar Industri)</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="pt-2">
-                                        <button onclick="switchPage('page-passport')" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs flex items-center justify-center gap-2 transition-colors">
-                                            <i class="fa-solid fa-qrcode"></i>
-                                            <span>Simulasi Cek Sertifikat Batch</span>
-                                        </button>
+                                    <div>
+                                        <h3 class="font-bold text-slate-900 text-base">Ekosistem Terintegrasi</h3>
+                                        <p class="text-xs text-slate-500">Real-time Supply Chain Tracking</p>
                                     </div>
                                 </div>
+                                <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">Terverifikasi</span>
                             </div>
-                        </div>
 
-                    </div>
-                </div>
-            </div>
-
-            <!-- Ecosystem Section: Two Sides We Connect -->
-            <div class="py-20 bg-white">
-                <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
-                        <span class="text-xs font-bold uppercase tracking-wider text-primary">Dua Sisi Solusi Terintegrasi</span>
-                        <h2 class="text-3xl font-extrabold text-emerald-dark">Satu Ekosistem yang Menghubungkan Sisi Pertanian & Industri</h2>
-                        <p class="text-slate-500 text-sm">Menjadikan limbah tak terpakai menjadi aset bernilai tinggi dengan jaminan kepastian pasokan dan kualitas standar lab.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <!-- Petani Card -->
-                        <div class="p-8 rounded-2xl bg-soft-bg border border-slate-200/80 hover:border-primary/40 transition-all shadow-card flex flex-col justify-between">
-                            <div class="space-y-4">
-                                <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-xl">
-                                    <i class="fa-solid fa-tractor"></i>
+                            <!-- Interactive Flow Teaser -->
+                            <div class="space-y-3">
+                                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between hover:bg-brand-50/50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">01</div>
+                                        <div>
+                                            <p class="text-sm font-bold text-slate-800">Petani / Poktan</p>
+                                            <p class="text-xs text-slate-500">Input Sekam, Batang Jagung, dll.</p>
+                                        </div>
+                                    </div>
+                                    <i class="fa-solid fa-arrow-right text-slate-400 text-xs"></i>
                                 </div>
-                                <h3 class="text-2xl font-bold text-emerald-dark">Untuk Petani & Gapoktan</h3>
-                                <p class="text-slate-600 text-sm leading-relaxed">
-                                    Hentikan pembakaran sisa panen yang mencemari udara. Dapatkan penghasilan tambahan langsung dari jerami, sekam, dan tongkol jagung yang terkumpul.
-                                </p>
-                                <ul class="space-y-2.5 text-sm text-slate-700 pt-2">
-                                    <li class="flex items-center gap-3">
-                                        <i class="fa-solid fa-circle-check text-primary"></i>
-                                        <span>Penjemputan & Pengumpulan Limbah Terjadwal</span>
-                                    </li>
-                                    <li class="flex items-center gap-3">
-                                        <i class="fa-solid fa-circle-check text-primary"></i>
-                                        <span>Insentif Poin Agri Credit yang Dapat Ditukar Pupuk</span>
-                                    </li>
-                                    <li class="flex items-center gap-3">
-                                        <i class="fa-solid fa-circle-check text-primary"></i>
-                                        <span>Pembayaran Transparan & Langsung</span>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="pt-6">
-                                <button onclick="switchPage('page-kemitraan'); setPartnershipTab('petani');" class="w-full py-3 rounded-xl border border-primary text-primary font-semibold text-sm hover:bg-primary hover:text-white transition-all">
-                                    Daftar Sebagai Mitra Petani
-                                </button>
-                            </div>
-                        </div>
 
-                        <!-- Industri Card -->
-                        <div class="p-8 rounded-2xl bg-emerald-dark text-white shadow-card flex flex-col justify-between">
-                            <div class="space-y-4">
-                                <div class="w-12 h-12 rounded-xl bg-lime-accent/20 text-lime-accent flex items-center justify-center font-bold text-xl">
-                                    <i class="fa-solid fa-industry"></i>
+                                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between hover:bg-brand-50/50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">02</div>
+                                        <div>
+                                            <p class="text-sm font-bold text-slate-800">Agri Hub Pengolahan</p>
+                                            <p class="text-xs text-slate-500">Uji Kelembapan & Densitas</p>
+                                        </div>
+                                    </div>
+                                    <i class="fa-solid fa-arrow-right text-slate-400 text-xs"></i>
                                 </div>
-                                <h3 class="text-2xl font-bold text-white">Untuk Industri B2B Off-taker</h3>
-                                <p class="text-emerald-100 text-sm leading-relaxed">
-                                    Amankan ketersediaan pasokan bahan baku biomassa terstandardisasi untuk Boiler Industri, PLTU Co-firing, dan Industri Biochar Karbon.
-                                </p>
-                                <ul class="space-y-2.5 text-sm text-emerald-100 pt-2">
-                                    <li class="flex items-center gap-3">
-                                        <i class="fa-solid fa-circle-check text-lime-accent"></i>
-                                        <span>Kualitas Teruji Lab (Kadar Air, Nilai Kalor, Kadar Abu)</span>
-                                    </li>
-                                    <li class="flex items-center gap-3">
-                                        <i class="fa-solid fa-circle-check text-lime-accent"></i>
-                                        <span>Sertifikasi Waste Passport Berbasis Traceability</span>
-                                    </li>
-                                    <li class="flex items-center gap-3">
-                                        <i class="fa-solid fa-circle-check text-lime-accent"></i>
-                                        <span>Kontrak Pasokan Jangka Panjang Terjamin</span>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="pt-6">
-                                <button onclick="switchPage('page-kemitraan'); setPartnershipTab('industri');" class="w-full py-3 rounded-xl bg-primary hover:bg-[#00914d] text-white font-semibold text-sm transition-all shadow-lg shadow-primary/30">
-                                    Akses Portal Industri B2B
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Summary 4 Pillars Overview Section -->
-            <div class="py-20 bg-soft-bg border-t border-slate-200/60">
-                <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
-                        <div>
-                            <span class="text-xs font-bold uppercase tracking-wider text-primary">Inovasi Teknologi</span>
-                            <h2 class="text-3xl font-extrabold text-emerald-dark mt-1">4 Pilar Utama Platform PadaTani</h2>
-                        </div>
-                        <button onclick="switchPage('page-platform')" class="mt-4 md:mt-0 text-primary font-semibold text-sm hover:underline flex items-center gap-2">
-                            <span>Lihat Detail Arsitektur Platform</span>
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <!-- Pillar 1 -->
-                        <div class="p-6 rounded-2xl bg-white border border-slate-200/70 shadow-sm hover:shadow-md transition-all">
-                            <div class="w-10 h-10 rounded-lg bg-emerald-100 text-primary flex items-center justify-center font-bold text-lg mb-4">
-                                <i class="fa-solid fa-coins"></i>
-                            </div>
-                            <h4 class="font-bold text-slate-800 text-lg mb-2">1. Agri Credit</h4>
-                            <p class="text-slate-500 text-xs leading-relaxed">
-                                Sistem monetisasi dan insentif kredit poin bagi petani untuk setiap kilogram limbah yang disetorkan ke Agri Hub.
-                            </p>
-                        </div>
-
-                        <!-- Pillar 2 -->
-                        <div class="p-6 rounded-2xl bg-white border border-slate-200/70 shadow-sm hover:shadow-md transition-all">
-                            <div class="w-10 h-10 rounded-lg bg-emerald-100 text-primary flex items-center justify-center font-bold text-lg mb-4">
-                                <i class="fa-solid fa-passport"></i>
-                            </div>
-                            <h4 class="font-bold text-slate-800 text-lg mb-2">2. Waste Passport</h4>
-                            <p class="text-slate-500 text-xs leading-relaxed">
-                                Paspor sertifikat digital batch limbah yang merekam asal-usul, hasil uji lab, serta dampak reduksi karbonnya.
-                            </p>
-                        </div>
-
-                        <!-- Pillar 3 -->
-                        <div class="p-6 rounded-2xl bg-white border border-slate-200/70 shadow-sm hover:shadow-md transition-all">
-                            <div class="w-10 h-10 rounded-lg bg-emerald-100 text-primary flex items-center justify-center font-bold text-lg mb-4">
-                                <i class="fa-solid fa-warehouse"></i>
-                            </div>
-                            <h4 class="font-bold text-slate-800 text-lg mb-2">3. Agri Waste Hubs</h4>
-                            <p class="text-slate-500 text-xs leading-relaxed">
-                                Pusat pengolahan lokal terdekat untuk proses pengeringan, pencacahan, briketisasi, dan pengemasan limbah.
-                            </p>
-                        </div>
-
-                        <!-- Pillar 4 -->
-                        <div class="p-6 rounded-2xl bg-white border border-slate-200/70 shadow-sm hover:shadow-md transition-all">
-                            <div class="w-10 h-10 rounded-lg bg-emerald-100 text-primary flex items-center justify-center font-bold text-lg mb-4">
-                                <i class="fa-solid fa-chart-line"></i>
-                            </div>
-                            <h4 class="font-bold text-slate-800 text-lg mb-2">4. B2B Dashboard</h4>
-                            <p class="text-slate-500 text-xs leading-relaxed">
-                                Portal integrasi untuk pemesanan volume besar industri, pemantauan pengiriman, dan laporan klaim klausa ESG.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= PAGE 2: PLATFORM ================= -->
-        <section id="page-platform" class="page-content hidden py-12">
-            <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-                
-                <!-- Page Title -->
-                <div class="text-center max-w-3xl mx-auto space-y-4">
-                    <span class="px-3 py-1 rounded-full bg-emerald-100 text-primary text-xs font-bold uppercase tracking-wider">Detail Platform</span>
-                    <h2 class="text-3xl sm:text-4xl font-extrabold text-emerald-dark">Arsitektur & Spesifikasi Mutu Ekosistem PadaTani</h2>
-                    <p class="text-slate-600 text-sm sm:text-base">Sistem terstruktur dari level lahan pertanian hingga integrasi industri manufaktur dan pembangkit energi.</p>
-                </div>
-
-                <!-- Workflow Architecture Diagram -->
-                <div class="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm space-y-8">
-                    <h3 class="text-xl font-bold text-slate-800 border-b pb-4 flex items-center gap-3">
-                        <i class="fa-solid fa-sitemap text-primary"></i>
-                        <span>Alur Kerja Rantai Pasok (Workflow Architecture)</span>
-                    </h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
-                        <!-- Step 1 -->
-                        <div class="p-5 rounded-xl bg-soft-bg border border-slate-200 relative hover:border-primary/50 transition-all hover:shadow-md">
-                            <div class="w-8 h-8 rounded-full bg-primary text-white font-bold flex items-center justify-center text-sm mb-3">1</div>
-                            <h4 class="font-bold text-slate-800 text-sm mb-1">Pengumpulan Lahan</h4>
-                            <p class="text-xs text-slate-500">Petani memanen & menyetorkan jerami, sekam, atau tongkol jagung ke Agri Hub terdekat.</p>
-                        </div>
-
-                        <!-- Step 2 -->
-                        <div class="p-5 rounded-xl bg-soft-bg border border-slate-200 relative hover:border-primary/50 transition-all hover:shadow-md">
-                            <div class="w-8 h-8 rounded-full bg-primary text-white font-bold flex items-center justify-center text-sm mb-3">2</div>
-                            <h4 class="font-bold text-slate-800 text-sm mb-1">Pengolahan Agri Hub</h4>
-                            <p class="text-xs text-slate-500">Proses pencacahan, rotari drying, briketisasi / peletisasi standar kelembapan &lt; 12%.</p>
-                        </div>
-
-                        <!-- Step 3 -->
-                        <div class="p-5 rounded-xl bg-soft-bg border border-slate-200 relative hover:border-primary/50 transition-all hover:shadow-md">
-                            <div class="w-8 h-8 rounded-full bg-primary text-white font-bold flex items-center justify-center text-sm mb-3">3</div>
-                            <h4 class="font-bold text-slate-800 text-sm mb-1">Uji Lab & Digital Passport</h4>
-                            <p class="text-xs text-slate-500">Pemeriksaan sampel lab untuk menguji Nilai Kalor, Kadar Abu, & penerbitan Waste Passport.</p>
-                        </div>
-
-                        <!-- Step 4 (FIXED: Standardized background consistent with steps 1, 2 & 3) -->
-                        <div class="p-5 rounded-xl bg-soft-bg border border-slate-200 relative hover:border-primary/50 transition-all hover:shadow-md">
-                            <div class="w-8 h-8 rounded-full bg-primary text-white font-bold flex items-center justify-center text-sm mb-3">4</div>
-                            <h4 class="font-bold text-slate-800 text-sm mb-1">Pasokan Industri B2B</h4>
-                            <p class="text-xs text-slate-500">Distribusi terjadwal ke pabrik off-taker dengan jaminan kontinuitas volume & sertifikasi ESG.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quality Specs Table -->
-                <div class="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm space-y-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
-                        <div>
-                            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-3">
-                                <i class="fa-solid fa-list-check text-primary"></i>
-                                <span>Katalog Standar Spesifikasi Mutu Bahan Baku Limbah</span>
-                            </h3>
-                            <p class="text-xs text-slate-500 mt-1">Kualifikasi teknis yang diverifikasi sebelum pengiriman ke Mitra Industri B2B.</p>
-                        </div>
-                        <span class="text-xs font-semibold px-3 py-1 bg-emerald-100 text-primary rounded-full self-start sm:self-auto">Standar ISO & Biomass Direct</span>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm border-collapse">
-                            <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-xs uppercase tracking-wider">
-                                    <th class="py-3 px-4">Jenis Limbah</th>
-                                    <th class="py-3 px-4">Kadar Air (Moisture)</th>
-                                    <th class="py-3 px-4">Nilai Kalor (MJ/kg)</th>
-                                    <th class="py-3 px-4">Mesh Size / Ukuran</th>
-                                    <th class="py-3 px-4">Kadar Abu (Ash)</th>
-                                    <th class="py-3 px-4">Aplikasi Utama</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100 text-slate-700 text-xs sm:text-sm">
-                                <tr class="hover:bg-slate-50/80 transition-colors">
-                                    <td class="py-3 px-4 font-semibold text-emerald-dark">Sekam Padi (Rice Husk)</td>
-                                    <td class="py-3 px-4">&le; 12%</td>
-                                    <td class="py-3 px-4 font-semibold text-primary">15.5 - 16.8 MJ/kg</td>
-                                    <td class="py-3 px-4">Pelet 6 - 8 mm</td>
-                                    <td class="py-3 px-4">&le; 13%</td>
-                                    <td class="py-3 px-4">Boiler Industri & Biochar</td>
-                                </tr>
-                                <tr class="hover:bg-slate-50/80 transition-colors">
-                                    <td class="py-3 px-4 font-semibold text-emerald-dark">Jerami Padi (Rice Straw)</td>
-                                    <td class="py-3 px-4">&le; 14%</td>
-                                    <td class="py-3 px-4 font-semibold text-primary">14.0 - 15.2 MJ/kg</td>
-                                    <td class="py-3 px-4">Cacah 2 - 5 cm / Briquet</td>
-                                    <td class="py-3 px-4">&le; 11%</td>
-                                    <td class="py-3 px-4">Co-firing PLTU & Feedstock</td>
-                                </tr>
-                                <tr class="hover:bg-slate-50/80 transition-colors">
-                                    <td class="py-3 px-4 font-semibold text-emerald-dark">Tongkol Jagung (Corn Cob)</td>
-                                    <td class="py-3 px-4">&le; 10%</td>
-                                    <td class="py-3 px-4 font-semibold text-primary">17.0 - 18.2 MJ/kg</td>
-                                    <td class="py-3 px-4">Grit 10 - 20 Mesh</td>
-                                    <td class="py-3 px-4">&le; 3.5%</td>
-                                    <td class="py-3 px-4">Briket Biomassa Super</td>
-                                </tr>
-                                <tr class="hover:bg-slate-50/80 transition-colors">
-                                    <td class="py-3 px-4 font-semibold text-emerald-dark">Ampas Tebu (Bagasse)</td>
-                                    <td class="py-3 px-4">&le; 15%</td>
-                                    <td class="py-3 px-4 font-semibold text-primary">16.2 - 17.5 MJ/kg</td>
-                                    <td class="py-3 px-4">Fiber Pellet 8 mm</td>
-                                    <td class="py-3 px-4">&le; 4.0%</td>
-                                    <td class="py-3 px-4">Pulp, Paper & Energy Boiler</td>
-                                </tr>
-                                <tr class="hover:bg-slate-50/80 transition-colors">
-                                    <td class="py-3 px-4 font-semibold text-emerald-dark">Sabut Kelapa (Coco Husk)</td>
-                                    <td class="py-3 px-4">&le; 12%</td>
-                                    <td class="py-3 px-4 font-semibold text-primary">18.0 - 19.1 MJ/kg</td>
-                                    <td class="py-3 px-4">Cocopeat & Fiber Block</td>
-                                    <td class="py-3 px-4">&le; 5.0%</td>
-                                    <td class="py-3 px-4">Media Tanam & Carbon Filter</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ================= PAGE 3: KALKULATOR POTENSI ================= -->
-        <section id="page-calculator" class="page-content hidden py-12">
-            <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-                
-                <div class="text-center max-w-2xl mx-auto space-y-3">
-                    <span class="px-3 py-1 rounded-full bg-emerald-100 text-primary text-xs font-bold uppercase tracking-wider">Simulasi Interaktif Multi-Parameter</span>
-                    <h2 class="text-3xl font-extrabold text-emerald-dark">Kalkulator Potensi Limbah Pertanian</h2>
-                    <p class="text-slate-600 text-sm">Hitung estimasi pendapatan tambahan petani, perolehan Agri Credit Points, potongan logistik jarak, serta proyeksi reduksi emisi CO2e.</p>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    
-                    <!-- Input Form Panel -->
-                    <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200/80 shadow-sm space-y-6">
-                        
-                        <!-- Select Commodity -->
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Pilih Jenis Komoditas Limbah:</label>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="commoditySelector">
-                                <button onclick="selectCommodity('jerami', this)" class="commodity-btn p-3 rounded-xl border-2 border-primary bg-emerald-50/50 text-left transition-all">
-                                    <div class="text-primary font-bold text-sm">Jerami Padi</div>
-                                    <div class="text-[11px] text-slate-500">Rp 250k / Ton</div>
-                                </button>
-                                <button onclick="selectCommodity('sekam', this)" class="commodity-btn p-3 rounded-xl border border-slate-200 text-left transition-all hover:border-primary">
-                                    <div class="font-bold text-slate-800 text-sm">Sekam Padi</div>
-                                    <div class="text-[11px] text-slate-500">Rp 350k / Ton</div>
-                                </button>
-                                <button onclick="selectCommodity('jagung', this)" class="commodity-btn p-3 rounded-xl border border-slate-200 text-left transition-all hover:border-primary">
-                                    <div class="font-bold text-slate-800 text-sm">Tongkol Jagung</div>
-                                    <div class="text-[11px] text-slate-500">Rp 400k / Ton</div>
-                                </button>
-                                <button onclick="selectCommodity('tebu', this)" class="commodity-btn p-3 rounded-xl border border-slate-200 text-left transition-all hover:border-primary">
-                                    <div class="font-bold text-slate-800 text-sm">Ampas Tebu</div>
-                                    <div class="text-[11px] text-slate-500">Rp 380k / Ton</div>
-                                </button>
-                                <button onclick="selectCommodity('kelapa', this)" class="commodity-btn p-3 rounded-xl border border-slate-200 text-left transition-all hover:border-primary">
-                                    <div class="font-bold text-slate-800 text-sm">Sabut Kelapa</div>
-                                    <div class="text-[11px] text-slate-500">Rp 450k / Ton</div>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- SLIDER 1: Tonnage Input -->
-                        <div class="space-y-2 pt-2">
-                            <div class="flex justify-between items-center">
-                                <label class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                                    <i class="fa-solid fa-weight-hanging text-primary"></i>
-                                    <span>1. Estimasi Tonase Limbah per Panen:</span>
-                                </label>
-                                <span class="text-lg font-extrabold text-primary" id="tonnageValueDisplay">25 Ton</span>
-                            </div>
-                            <input type="range" id="tonnageSlider" min="1" max="200" value="25" oninput="updateCalculator()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary">
-                            <div class="flex justify-between text-[11px] text-slate-400 font-medium">
-                                <span>1 Ton</span>
-                                <span>100 Ton</span>
-                                <span>200 Ton</span>
-                            </div>
-                        </div>
-
-                        <!-- SLIDER 2: Moisture Slider -->
-                        <div class="space-y-2 pt-2">
-                            <div class="flex justify-between items-center">
-                                <label class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                                    <i class="fa-solid fa-droplet text-blue-500"></i>
-                                    <span>2. Kadar Kelembapan (Moisture %):</span>
-                                </label>
-                                <span class="text-lg font-extrabold text-slate-800" id="moistureValueDisplay">14% (Standar)</span>
-                            </div>
-                            <input type="range" id="moistureSlider" min="10" max="40" value="14" oninput="updateCalculator()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary">
-                            <div class="flex justify-between text-[11px] text-slate-400 font-medium">
-                                <span>10% (Kering Super)</span>
-                                <span>25% (Sedang)</span>
-                                <span>40% (Basah Panen)</span>
-                            </div>
-                        </div>
-
-                        <!-- SLIDER 3: Distance Slider -->
-                        <div class="space-y-2 pt-2">
-                            <div class="flex justify-between items-center">
-                                <label class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                                    <i class="fa-solid fa-truck-ramp-box text-emerald-600"></i>
-                                    <span>3. Jarak Transportasi ke Agri Hub:</span>
-                                </label>
-                                <span class="text-lg font-extrabold text-slate-800" id="distanceValueDisplay">15 km</span>
-                            </div>
-                            <input type="range" id="distanceSlider" min="2" max="100" value="15" oninput="updateCalculator()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary">
-                            <div class="flex justify-between text-[11px] text-slate-400 font-medium">
-                                <span>2 km (Dekat)</span>
-                                <span>50 km (Sedang)</span>
-                                <span>100 km (Jauh)</span>
-                            </div>
-                        </div>
-
-                        <!-- Farm Area Size Helper -->
-                        <div class="p-4 rounded-xl bg-soft-bg border border-slate-200 flex items-center justify-between text-xs">
-                            <span class="text-slate-600">Estimasi Luas Lahan Terkait:</span>
-                            <span class="font-bold text-emerald-dark" id="estimatedAreaDisplay">~ 5 Hektar Sawah</span>
-                        </div>
-                    </div>
-
-                    <!-- Output Summary Card -->
-                    <div class="lg:col-span-5 bg-emerald-dark text-white p-6 sm:p-8 rounded-2xl shadow-lg space-y-6">
-                        <div class="border-b border-emerald-800/80 pb-4">
-                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-chart-pie text-lime-accent"></i>
-                                <span>Hasil Kalkulasi Real-time</span>
-                            </h3>
-                            <p class="text-xs text-emerald-200">Kalkulasi telah memperhitungkan penyesuaian mutu & biaya logistik.</p>
-                        </div>
-
-                        <div class="space-y-4">
-                            <!-- Net Income -->
-                            <div class="bg-emerald-900/50 p-4 rounded-xl border border-emerald-700/50">
-                                <span class="text-xs text-emerald-300 font-medium uppercase tracking-wider block">Estimasi Pendapatan Bersih Petani</span>
-                                <span class="text-2xl sm:text-3xl font-extrabold text-lime-accent" id="incomeResult">Rp 6.250.000</span>
-                                <div class="text-[11px] text-emerald-300/80 mt-1" id="logisticsBreakdown">Kotor: Rp 6.250.000 | Transport: -Rp 0</div>
-                            </div>
-
-                            <!-- Agri Credit Points & Carbon -->
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="bg-emerald-900/50 p-3.5 rounded-xl border border-emerald-700/50">
-                                    <span class="text-[11px] text-emerald-300 block">Agri Credit Points</span>
-                                    <span class="text-xl font-bold text-white" id="pointsResult">3.750 PTS</span>
+                                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between hover:bg-brand-50/50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">03</div>
+                                        <div>
+                                            <p class="text-sm font-bold text-slate-800">Digital Waste Passport</p>
+                                            <p class="text-xs text-slate-500">Sertifikat Nilai Kalor & QR</p>
+                                        </div>
+                                    </div>
+                                    <i class="fa-solid fa-arrow-right text-slate-400 text-xs"></i>
                                 </div>
-                                <div class="bg-emerald-900/50 p-3.5 rounded-xl border border-emerald-700/50">
-                                    <span class="text-[11px] text-emerald-300 block">Reduksi Carbon</span>
-                                    <span class="text-xl font-bold text-white" id="co2Result">30.0 Ton CO2e</span>
+
+                                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between hover:bg-brand-50/50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">04</div>
+                                        <div>
+                                            <p class="text-sm font-bold text-slate-800">Industri B2B Offtaker</p>
+                                            <p class="text-xs text-slate-500">Pasokan Biomassa Berkelanjutan</p>
+                                        </div>
+                                    </div>
+                                    <i class="fa-solid fa-check text-brand-600 text-xs"></i>
                                 </div>
                             </div>
 
-                            <!-- Equivalent Impact -->
-                            <div class="p-3.5 rounded-xl bg-emerald-900/30 border border-emerald-800 text-xs text-emerald-200 space-y-1">
-                                <div class="font-semibold text-lime-accent">Ekuivalensi Dampak Lingkungan:</div>
-                                <div id="impactEquivDisplay">Setara meniadakan emisi dari 12 unit kendaraan bermotor per tahun.</div>
-                            </div>
-                        </div>
-
-                        <button onclick="switchPage('page-kemitraan'); setPartnershipTab('petani');" class="w-full py-3 bg-primary hover:bg-[#00914d] text-white font-semibold rounded-xl text-sm transition-all shadow-md">
-                            Klaim & Salurkan Limbah Sekarang
-                        </button>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= PAGE 4: WASTE PASSPORT ================= -->
-        <section id="page-passport" class="page-content hidden py-12">
-            <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-                
-                <div class="text-center max-w-2xl mx-auto space-y-3">
-                    <span class="px-3 py-1 rounded-full bg-emerald-100 text-primary text-xs font-bold uppercase tracking-wider">Verifikasi Rantai Pasok Digital</span>
-                    <h2 class="text-3xl font-extrabold text-emerald-dark">Verifikator Waste Passport Digital</h2>
-                    <p class="text-slate-600 text-sm">Lakukan pengecekan otentisitas batch limbah, sertifikat hasil lab, dan histori jejak karbon.</p>
-                </div>
-
-                <!-- Search / Batch Lookup Form -->
-                <div class="max-w-xl mx-auto bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-2">
-                    <div class="relative flex-grow">
-                        <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
-                        <input type="text" id="batchIdInput" value="BATCH-2026-JATIM-089" placeholder="Masukkan ID Batch (contoh: BATCH-2026-JATIM-089)" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary">
-                    </div>
-                    <button onclick="verifyBatch()" class="px-6 py-2.5 bg-primary hover:bg-[#00914d] text-white font-semibold text-sm rounded-xl transition-all">
-                        Verifikasi
-                    </button>
-                </div>
-
-                <!-- Sample Preset Buttons -->
-                <div class="flex flex-wrap justify-center items-center gap-2 text-xs">
-                    <span class="text-slate-400">Atau coba sampel batch:</span>
-                    <button onclick="loadSampleBatch('BATCH-2026-JATIM-089')" class="px-2.5 py-1 bg-white border border-slate-200 rounded-lg hover:border-primary text-slate-600 font-mono">BATCH-2026-JATIM-089</button>
-                    <button onclick="loadSampleBatch('BATCH-2026-JABAR-114')" class="px-2.5 py-1 bg-white border border-slate-200 rounded-lg hover:border-primary text-slate-600 font-mono">BATCH-2026-JABAR-114</button>
-                    <button onclick="loadSampleBatch('BATCH-2026-SUMSEL-042')" class="px-2.5 py-1 bg-white border border-slate-200 rounded-lg hover:border-primary text-slate-600 font-mono">BATCH-2026-SUMSEL-042</button>
-                </div>
-
-                <!-- Certificate Display Card -->
-                <div id="certificateCard" class="max-w-3xl mx-auto bg-white border-2 border-emerald-500/30 rounded-2xl p-6 sm:p-8 shadow-figma space-y-6">
-                    
-                    <!-- Header Cert -->
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-5">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-extrabold text-xl">
-                                <i class="fa-solid fa-award"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-extrabold text-slate-800 text-lg sm:text-xl">Sertifikat Digital Waste Passport</h3>
-                                <p class="text-xs text-slate-500">Diterbitkan oleh PadaTani Quality Assurance Lab</p>
-                            </div>
-                        </div>
-                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-primary border border-emerald-300">
-                            <i class="fa-solid fa-circle-check mr-1"></i> Status: Qualified B2B
-                        </span>
-                    </div>
-
-                    <!-- Metadata Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                        <div class="p-3.5 rounded-xl bg-soft-bg border border-slate-100 space-y-1">
-                            <span class="text-slate-400 font-medium">Nomor ID Batch:</span>
-                            <div class="font-bold text-slate-800 font-mono text-sm" id="certBatchId">BATCH-2026-JATIM-089</div>
-                        </div>
-                        <div class="p-3.5 rounded-xl bg-soft-bg border border-slate-100 space-y-1">
-                            <span class="text-slate-400 font-medium">Asal Kelompok Tani / Hub:</span>
-                            <div class="font-bold text-slate-800 text-sm" id="certOrigin">Gapoktan Sri Rejeki, Malang</div>
-                        </div>
-                        <div class="p-3.5 rounded-xl bg-soft-bg border border-slate-100 space-y-1">
-                            <span class="text-slate-400 font-medium">Komoditas & Volume:</span>
-                            <div class="font-bold text-slate-800 text-sm" id="certCommodity">Sekam Padi Pelet (80 Ton)</div>
-                        </div>
-                        <div class="p-3.5 rounded-xl bg-soft-bg border border-slate-100 space-y-1">
-                            <span class="text-slate-400 font-medium">Tanggal Sertifikasi:</span>
-                            <div class="font-bold text-slate-800 text-sm" id="certDate">18 September 2026</div>
-                        </div>
-                    </div>
-
-                    <!-- Lab Test Specs Summary -->
-                    <div class="space-y-3">
-                        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider">Hasil Pengujian Laboratorium Terakreditasi:</h4>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100">
-                                <span class="text-[10px] text-slate-500 block">Kadar Air</span>
-                                <span class="font-bold text-emerald-dark text-sm" id="certMoisture">11.4%</span>
-                            </div>
-                            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100">
-                                <span class="text-[10px] text-slate-500 block">Nilai Kalor</span>
-                                <span class="font-bold text-primary text-sm" id="certCalorific">16.6 MJ/kg</span>
-                            </div>
-                            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100">
-                                <span class="text-[10px] text-slate-500 block">Kadar Abu</span>
-                                <span class="font-bold text-emerald-dark text-sm" id="certAsh">12.1%</span>
-                            </div>
-                            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100">
-                                <span class="text-[10px] text-slate-500 block">Reduksi Carbon</span>
-                                <span class="font-bold text-primary text-sm" id="certCO2">96.0 Ton CO2e</span>
+                            <div class="p-4 rounded-2xl bg-gradient-to-r from-brand-600 to-emerald-700 text-white flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs font-medium text-brand-100">Transaksi Teraman & Terjangkau</p>
+                                    <p class="text-sm font-bold">Garansi Mutu Lab SNI / ISO</p>
+                                </div>
+                                <i class="fa-solid fa-shield-virus text-2xl text-brand-200"></i>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Provenance Audit Trail -->
-                    <div class="space-y-3 pt-2">
-                        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider">Riwayat Audit Rantai Pasok:</h4>
-                        <div class="space-y-2 text-xs">
-                            <div class="flex items-center gap-3 p-2.5 rounded-lg bg-soft-bg">
-                                <i class="fa-solid fa-check text-primary"></i>
-                                <span class="text-slate-700"><strong>Panen & Pengumpulan:</strong> Lahan Desa Sengguruh, Kec. Kepanjen</span>
-                            </div>
-                            <div class="flex items-center gap-3 p-2.5 rounded-lg bg-soft-bg">
-                                <i class="fa-solid fa-check text-primary"></i>
-                                <span class="text-slate-700"><strong>Pengolahan Hub:</strong> Agri Hub Malang (Drying & Pelletizing)</span>
-                            </div>
-                            <div class="flex items-center gap-3 p-2.5 rounded-lg bg-soft-bg">
-                                <i class="fa-solid fa-check text-primary"></i>
-                                <span class="text-slate-700"><strong>Sertifikasi Lab:</strong> Lulus standar COA Co-firing Biomass</span>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
-
-            </div>
-        </section>
-
-        <!-- ================= PAGE 5: AGRI HUBS ================= -->
-        <section id="page-hubs" class="page-content hidden py-12">
-            <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-                
-                <div class="text-center max-w-2xl mx-auto space-y-3">
-                    <span class="px-3 py-1 rounded-full bg-emerald-100 text-primary text-xs font-bold uppercase tracking-wider">Jaringan Hub Pengolahan</span>
-                    <h2 class="text-3xl font-extrabold text-emerald-dark">Direktori Agri Waste Hubs</h2>
-                    <p class="text-slate-600 text-sm">Pusat pengumpulan, pencacahan, dan pengolahan limbah terdekat yang siap melayani pasokan.</p>
-                </div>
-
-                <!-- Region Filter Buttons -->
-                <div class="flex flex-wrap justify-center gap-2">
-                    <button onclick="filterHubs('all', this)" class="hub-filter-btn px-4 py-2 rounded-xl bg-primary text-white font-semibold text-xs shadow-sm">
-                        Semua Wilayah
-                    </button>
-                    <button onclick="filterHubs('jatim', this)" class="hub-filter-btn px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:border-primary">
-                        Jawa Timur
-                    </button>
-                    <button onclick="filterHubs('jabar', this)" class="hub-filter-btn px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:border-primary">
-                        Jawa Barat
-                    </button>
-                    <button onclick="filterHubs('jateng', this)" class="hub-filter-btn px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:border-primary">
-                        Jawa Tengah
-                    </button>
-                    <button onclick="filterHubs('sumsel', this)" class="hub-filter-btn px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:border-primary">
-                        Sumatra Selatan
-                    </button>
-                </div>
-
-                <!-- Hub Cards Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="hubsGrid">
-                    
-                    <!-- Hub Card 1 -->
-                    <div class="hub-card bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all space-y-4" data-region="jatim">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <span class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-primary text-[11px] font-bold">Jawa Timur</span>
-                                <h3 class="font-bold text-slate-800 text-lg mt-1">Agri Hub Malang</h3>
-                            </div>
-                            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                        </div>
-                        <p class="text-xs text-slate-500">Kec. Kepanjen, Kab. Malang, Jawa Timur</p>
-                        
-                        <div class="space-y-1.5">
-                            <div class="flex justify-between text-xs font-semibold">
-                                <span class="text-slate-600">Kapasitas Bulan Ini:</span>
-                                <span class="text-primary">850 / 1.000 Ton</span>
-                            </div>
-                            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-primary rounded-full" style="width: 85%;"></div>
-                            </div>
-                        </div>
-
-                        <div class="pt-2 text-xs space-y-2 border-t border-slate-100">
-                            <div class="text-slate-600"><strong>Fasilitas:</strong> Rotary Dryer, Peletizer, Briket Press</div>
-                            <div class="text-slate-600"><strong>Koordinator:</strong> Bpk. Budi Santoso</div>
-                        </div>
-
-                        <button onclick="switchPage('page-kemitraan')" class="w-full py-2.5 rounded-xl border border-primary text-primary font-semibold text-xs hover:bg-primary hover:text-white transition-all">
-                            Hubungi Hub Ini
-                        </button>
-                    </div>
-
-                    <!-- Hub Card 2 -->
-                    <div class="hub-card bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all space-y-4" data-region="jabar">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <span class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-primary text-[11px] font-bold">Jawa Barat</span>
-                                <h3 class="font-bold text-slate-800 text-lg mt-1">Agri Hub Subang</h3>
-                            </div>
-                            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                        </div>
-                        <p class="text-xs text-slate-500">Kec. Ciasem, Kab. Subang, Jawa Barat</p>
-
-                        <div class="space-y-1.5">
-                            <div class="flex justify-between text-xs font-semibold">
-                                <span class="text-slate-600">Kapasitas Bulan Ini:</span>
-                                <span class="text-primary">1.200 / 1.500 Ton</span>
-                            </div>
-                            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-primary rounded-full" style="width: 80%;"></div>
-                            </div>
-                        </div>
-
-                        <div class="pt-2 text-xs space-y-2 border-t border-slate-100">
-                            <div class="text-slate-600"><strong>Fasilitas:</strong> Hammer Mill, Biochar Pyrolysis</div>
-                            <div class="text-slate-600"><strong>Koordinator:</strong> Bpk. Asep Pratama</div>
-                        </div>
-
-                        <button onclick="switchPage('page-kemitraan')" class="w-full py-2.5 rounded-xl border border-primary text-primary font-semibold text-xs hover:bg-primary hover:text-white transition-all">
-                            Hubungi Hub Ini
-                        </button>
-                    </div>
-
-                    <!-- Hub Card 3 -->
-                    <div class="hub-card bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all space-y-4" data-region="jateng">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <span class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-primary text-[11px] font-bold">Jawa Tengah</span>
-                                <h3 class="font-bold text-slate-800 text-lg mt-1">Agri Hub Sragen</h3>
-                            </div>
-                            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                        </div>
-                        <p class="text-xs text-slate-500">Kec. Masaran, Kab. Sragen, Jawa Tengah</p>
-
-                        <div class="space-y-1.5">
-                            <div class="flex justify-between text-xs font-semibold">
-                                <span class="text-slate-600">Kapasitas Bulan Ini:</span>
-                                <span class="text-primary">600 / 900 Ton</span>
-                            </div>
-                            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-primary rounded-full" style="width: 66%;"></div>
-                            </div>
-                        </div>
-
-                        <div class="pt-2 text-xs space-y-2 border-t border-slate-100">
-                            <div class="text-slate-600"><strong>Fasilitas:</strong> Drying Yard, Straw Baler, Silo Storage</div>
-                            <div class="text-slate-600"><strong>Koordinator:</strong> Ibu Sri Wahyuni</div>
-                        </div>
-
-                        <button onclick="switchPage('page-kemitraan')" class="w-full py-2.5 rounded-xl border border-primary text-primary font-semibold text-xs hover:bg-primary hover:text-white transition-all">
-                            Hubungi Hub Ini
-                        </button>
-                    </div>
-
-                    <!-- Hub Card 4 -->
-                    <div class="hub-card bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all space-y-4" data-region="sumsel">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <span class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-primary text-[11px] font-bold">Sumatra Selatan</span>
-                                <h3 class="font-bold text-slate-800 text-lg mt-1">Agri Hub Ogan Komering</h3>
-                            </div>
-                            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                        </div>
-                        <p class="text-xs text-slate-500">Kab. Ogan Komering Ilir, Sumatra Selatan</p>
-
-                        <div class="space-y-1.5">
-                            <div class="flex justify-between text-xs font-semibold">
-                                <span class="text-slate-600">Kapasitas Bulan Ini:</span>
-                                <span class="text-primary">950 / 1.200 Ton</span>
-                            </div>
-                            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-primary rounded-full" style="width: 79%;"></div>
-                            </div>
-                        </div>
-
-                        <div class="pt-2 text-xs space-y-2 border-t border-slate-100">
-                            <div class="text-slate-600"><strong>Fasilitas:</strong> Tebu Bagasse Dryer & Briquetting</div>
-                            <div class="text-slate-600"><strong>Koordinator:</strong> Bpk. Hendra Wijaya</div>
-                        </div>
-
-                        <button onclick="switchPage('page-kemitraan')" class="w-full py-2.5 rounded-xl border border-primary text-primary font-semibold text-xs hover:bg-primary hover:text-white transition-all">
-                            Hubungi Hub Ini
-                        </button>
-                    </div>
-
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ================= PAGE 6: KEMITRAAN / REGISTRASI ================= -->
-        <section id="page-kemitraan" class="page-content hidden py-12">
-            <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-                
-                <div class="text-center max-w-2xl mx-auto space-y-3">
-                    <span class="px-3 py-1 rounded-full bg-emerald-100 text-primary text-xs font-bold uppercase tracking-wider">Gabung Ekosistem</span>
-                    <h2 class="text-3xl font-extrabold text-emerald-dark">Form Pendaftaran Kemitraan</h2>
-                    <p class="text-slate-600 text-sm">Pilih kategori kemitraan sesuai dengan profil Anda untuk memulai integrasi rantai pasok.</p>
-                </div>
-
-                <!-- Tab Segment Switcher -->
-                <div class="max-w-md mx-auto bg-slate-200/70 p-1.5 rounded-2xl flex gap-1">
-                    <button onclick="setPartnershipTab('petani')" id="tabPetaniBtn" class="flex-1 py-2.5 rounded-xl font-bold text-xs transition-all bg-white text-emerald-dark shadow-sm">
-                        <i class="fa-solid fa-seedling mr-1 text-primary"></i> Mitra Petani / Gapoktan
-                    </button>
-                    <button onclick="setPartnershipTab('industri')" id="tabIndustriBtn" class="flex-1 py-2.5 rounded-xl font-bold text-xs transition-all text-slate-600 hover:text-slate-900">
-                        <i class="fa-solid fa-building mr-1"></i> Mitra Industri B2B
-                    </button>
-                </div>
-
-                <!-- Form Panel -->
-                <div class="max-w-2xl mx-auto bg-white p-6 sm:p-10 rounded-2xl border border-slate-200/80 shadow-figma">
-                    
-                    <!-- Farmer Form -->
-                    <form id="farmerForm" onsubmit="handleFormSubmit(event, 'Petani')" class="space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Lengkap / Ketua Kelompok:</label>
-                                <input type="text" required placeholder="Contoh: Budi Santoso" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Gapoktan / Kelompok Tani:</label>
-                                <input type="text" required placeholder="Contoh: Gapoktan Tani Makmur" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nomor WhatsApp Direct:</label>
-                                <input type="tel" required placeholder="0813-xxxx-xxxx" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Lokasi Lahan (Kabupaten/Kota):</label>
-                                <input type="text" required placeholder="Contoh: Malang, Jawa Timur" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Jenis Limbah Utama yang Dihasilkan:</label>
-                            <select class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary">
-                                <option>Jerami Padi</option>
-                                <option>Sekam Padi</option>
-                                <option>Tongkol Jagung</option>
-                                <option>Ampas Tebu</option>
-                                <option>Sabut Kelapa</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Estimasi Tonase Limbah per Panen:</label>
-                            <input type="text" placeholder="Contoh: 30 Ton / Panen" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary">
-                        </div>
-
-                        <button type="submit" class="w-full py-3 bg-primary hover:bg-[#00914d] text-white font-semibold text-sm rounded-xl shadow-md shadow-primary/20 transition-all">
-                            Kirim Pendaftaran Mitra Petani
-                        </button>
-                    </form>
-
-                    <!-- Industry B2B Form (Hidden by default) -->
-                    <form id="industryForm" onsubmit="handleFormSubmit(event, 'Industri B2B')" class="space-y-4 hidden">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Perusahaan / PT:</label>
-                                <input type="text" required placeholder="Contoh: PT Energi Biomassa Nusantara" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Jabatan / Perwakilan:</label>
-                                <input type="text" required placeholder="Contoh: Procurement Manager" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Email Perusahaan:</label>
-                                <input type="email" required placeholder="procurement@perusahaan.com" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nomor Telepon / WA Off-taker:</label>
-                                <input type="tel" required placeholder="0813-xxxx-xxxx" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Kebutuhan Spesifikasi Biomassa:</label>
-                            <select class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary">
-                                <option>Pellet Sekam Padi (Co-firing Boiler)</option>
-                                <option>Briket Tongkol Jagung High-Calorie</option>
-                                <option>Cacahan Jerami Padi (Feedstock)</option>
-                                <option>Biochar Karbonisasi</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Estimasi Kebutuhan Pasokan Bulanan (Ton):</label>
-                            <input type="text" placeholder="Contoh: 500 Ton / Bulan" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-primary">
-                        </div>
-
-                        <button type="submit" class="w-full py-3 bg-emerald-dark hover:bg-slate-900 text-white font-semibold text-sm rounded-xl shadow-md transition-all">
-                            Kirim Permintaan Portal Industri B2B
-                        </button>
-                    </form>
-
-                </div>
-
-            </div>
-        </section>
-
-    </main>
-
-    <!-- ================= FLOATING ASISTEN / MASKOT MODERN (Si Tani / PadaBot) ================= -->
-    <div class="fixed bottom-6 right-6 z-50">
-        <!-- Floating Trigger Button -->
-        <button onclick="toggleTaniBot()" aria-label="Buka Chat Asisten Si Tani" class="relative group flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-tr from-[#0B4127] to-[#00A859] text-white shadow-float hover:scale-105 transition-all">
-            <!-- Modern Leaf/Agri-Tech Vector Avatar -->
-            <svg class="w-7 h-7 text-lime-accent group-hover:rotate-12 transition-transform" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M17,13C17,15.2 15.2,17 13,17C10.8,17 9,15.2 9,13C9,10.8 13,6.5 13,6.5C13,6.5 17,10.8 17,13Z"/>
-            </svg>
-            <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-lime-accent border-2 border-white flex items-center justify-center">
-                <span class="w-2 h-2 rounded-full bg-emerald-900 animate-ping"></span>
-            </span>
-        </button>
-
-        <!-- Pop-up Chatbot Panel (FIXED: STRICTLY 'hidden' BY DEFAULT, OPENS ONLY ON CLICK) -->
-        <div id="taniBotPanel" class="hidden absolute bottom-18 right-0 w-[340px] sm:w-[380px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col transition-all">
-            <!-- Header Panel -->
-            <div class="bg-gradient-to-r from-emerald-dark to-primary p-4 text-white flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
-                        <i class="fa-solid fa-leaf text-lime-accent text-base"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm">Si Tani (PadaBot)</h4>
-                        <span class="text-[10px] text-emerald-200 flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-lime-accent"></span> Online Agro-Tech Support
-                        </span>
-                    </div>
-                </div>
-                <button onclick="toggleTaniBot()" class="text-white/80 hover:text-white p-1" aria-label="Tutup Chat">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <!-- Chat Content Body -->
-            <div class="p-4 space-y-3 text-xs bg-soft-bg max-h-[380px] overflow-y-auto" id="botChatContainer">
-                <div class="p-3 rounded-xl bg-white border border-slate-200 text-slate-700 leading-relaxed shadow-sm">
-                    Halo! Saya <strong>Si Tani</strong>, asisten interaktif PadaTani. Ada yang bisa saya bantu terkait integrasi limbah pertanian atau kemitraan industri hari ini?
-                </div>
-
-                <!-- Predefined Interactive Action Pills -->
-                <div class="space-y-2 pt-1">
-                    <span class="font-bold text-slate-400 uppercase text-[10px] tracking-wider block">Topik Populer:</span>
-                    
-                    <button onclick="botQuickAction('passport')" class="w-full text-left p-2.5 rounded-xl bg-white border border-slate-200 hover:border-primary text-slate-700 font-medium transition-all flex items-center justify-between">
-                        <span>Cara Kerja Waste Passport Digital</span>
-                        <i class="fa-solid fa-chevron-right text-slate-400 text-[10px]"></i>
-                    </button>
-
-                    <button onclick="botQuickAction('calc')" class="w-full text-left p-2.5 rounded-xl bg-white border border-slate-200 hover:border-primary text-slate-700 font-medium transition-all flex items-center justify-between">
-                        <span>Hitung Estimasi Income Limbah Saya</span>
-                        <i class="fa-solid fa-chevron-right text-slate-400 text-[10px]"></i>
-                    </button>
-
-                    <a href="https://wa.me/6281334349522?text=Halo%20Tim%20PadaTani,%20saya%20ingin%20konsultasi%20mengenai%20kemitraan%20limbah%20pertanian." target="_blank" class="w-full p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-all flex items-center justify-between">
-                        <span class="flex items-center gap-2">
-                            <i class="fa-brands fa-whatsapp text-sm"></i> Direct WhatsApp (0813-3434-9522)
-                        </span>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                    </a>
-
-                    <a href="mailto:drupadilathifa@gmail.com" class="w-full p-2.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-medium transition-all flex items-center justify-between">
-                        <span class="flex items-center gap-2">
-                            <i class="fa-solid fa-envelope text-xs"></i> Email: drupadilathifa@gmail.com
-                        </span>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Quick Chat Input Box -->
-            <div class="p-2.5 bg-white border-t border-slate-100 flex items-center gap-2">
-                <input type="text" id="botInputText" onkeypress="handleBotKeyPress(event)" placeholder="Ketik pertanyaan singkat..." class="flex-grow px-3 py-2 rounded-xl bg-slate-100 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-primary">
-                <button onclick="sendBotMessage()" class="w-8 h-8 rounded-xl bg-primary text-white flex items-center justify-center hover:bg-[#00914d] transition-colors">
-                    <i class="fa-solid fa-paper-plane text-xs"></i>
-                </button>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- ================= FOOTER ================= -->
-    <footer class="bg-emerald-dark text-white border-t border-emerald-900/50 pt-16 pb-12">
-        <div class="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
-                
-                <!-- Brand Info -->
-                <div class="md:col-span-5 space-y-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center font-bold text-white text-xl">P</div>
-                        <span class="text-2xl font-bold tracking-tight text-white">PadaTani</span>
+    <!-- Section: Alur Kerja Ekosistem -->
+    <section id="alur-kerja" class="py-20 bg-white border-y border-slate-200/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-bold tracking-widest text-brand-600 uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-200">Alur Rantai Pasok Integratif</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3 tracking-tight">4 Langkah Sederhana Mengolah Limbah Menjadi Nilai Ekonomi</h2>
+                <p class="text-slate-600 mt-3 text-base sm:text-lg">Setiap tahap dirancang untuk menjaga kualitas biomassa, efisiensi logistik, serta kepastian pasar bagi para mitra.</p>
+            </div>
+
+            <!-- Workflow Cards Grid (Uniform layout for Cards 1, 2, 3, and 4) -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 hover:border-brand-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-brand-50 border border-brand-200 text-brand-600 flex items-center justify-center text-xl font-bold group-hover:bg-brand-600 group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-tractor"></i>
+                            </div>
+                            <span class="text-2xl font-black text-brand-600 bg-brand-50 px-3 py-0.5 rounded-xl border border-brand-200">01</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Penampungan & Grading</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Petani mengumpulkan limbah sekam, batang jagung, atau cangkang. Tim melakukan penilaian awal kadar air dan kebersihan lokasi.</p>
                     </div>
-                    <p class="text-emerald-200 text-xs sm:text-sm max-w-sm leading-relaxed">
-                        Platform integrasi limbah pertanian berbasis digital untuk menciptakan sirkularitas rantai pasok biomassa dan kesejahteraan petani Indonesia.
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center text-xs font-bold text-brand-600">
+                        <span>Tingkat Kelompok Tani</span>
+                        <i class="fa-solid fa-chevron-right ml-auto"></i>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 hover:border-brand-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-brand-50 border border-brand-200 text-brand-600 flex items-center justify-center text-xl font-bold group-hover:bg-brand-600 group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-qrcode"></i>
+                            </div>
+                            <span class="text-2xl font-black text-brand-600 bg-brand-50 px-3 py-0.5 rounded-xl border border-brand-200">02</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Digital Waste Passport</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Penerbitan identitas digital unik mencakup data asal ladang, berat tonase, estimasi nilai kalor, dan estimasi pengurangan jejak karbon.</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center text-xs font-bold text-brand-600">
+                        <span>Sertifikasi & Tracking</span>
+                        <i class="fa-solid fa-chevron-right ml-auto"></i>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 hover:border-brand-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-brand-50 border border-brand-200 text-brand-600 flex items-center justify-center text-xl font-bold group-hover:bg-brand-600 group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-gears"></i>
+                            </div>
+                            <span class="text-2xl font-black text-brand-600 bg-brand-50 px-3 py-0.5 rounded-xl border border-brand-200">03</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Pengolahan Agri Hub</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Agri Hub memproses limbah menjadi briket, pelet biomassa, atau produk pencacahan siap pakai dengan kontrol kualitas ketat.</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center text-xs font-bold text-brand-600">
+                        <span>Standardisasi & Densitas</span>
+                        <i class="fa-solid fa-chevron-right ml-auto"></i>
+                    </div>
+                </div>
+
+                <!-- Card 4 (FIXED: Uniform styling matching Cards 1, 2, 3) -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 hover:border-brand-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-brand-50 border border-brand-200 text-brand-600 flex items-center justify-center text-xl font-bold group-hover:bg-brand-600 group-hover:text-white transition-colors">
+                                <i class="fa-solid fa-truck-ramp-box"></i>
+                            </div>
+                            <span class="text-2xl font-black text-brand-600 bg-brand-50 px-3 py-0.5 rounded-xl border border-brand-200">04</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Pasokan Industri B2B</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Distribusi biomassa berkualitas tinggi ke pabrik, pembangkit listrik, atau industri manufaktur sesuai kesepakatan kontrak pasokan.</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center text-xs font-bold text-brand-600">
+                        <span>Kontrak Pasokan B2B</span>
+                        <i class="fa-solid fa-chevron-right ml-auto"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: Katalog & Spesifikasi Kualitas Limbah -->
+    <section id="katalog" class="py-20 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+                <div>
+                    <span class="text-xs font-bold tracking-widest text-brand-600 uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-200">Standar Mutu Biomassa</span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3 tracking-tight">Katalog Limbah & Spesifikasi Teknis</h2>
+                    <p class="text-slate-600 mt-2 text-base">Seluruh komoditas diuji laboratorium secara berkala untuk memenuhi standar kalor industri.</p>
+                </div>
+
+                <!-- Filter Category Tabs -->
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="filterCatalog('all', this)" class="catalog-tab active px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-brand-600 text-white transition-colors">Semua Limbah</button>
+                    <button type="button" onclick="filterCatalog('padi', this)" class="catalog-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:border-brand-500 transition-colors">Biomassa Padi</button>
+                    <button type="button" onclick="filterCatalog('jagung', this)" class="catalog-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:border-brand-500 transition-colors">Biomassa Jagung</button>
+                    <button type="button" onclick="filterCatalog('sawit', this)" class="catalog-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-600 border border-slate-200 hover:border-brand-500 transition-colors">Biomassa Sawit</button>
+                </div>
+            </div>
+
+            <!-- Catalog Items Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="catalog-grid">
+                <!-- Item 1: Sekam Padi -->
+                <div class="catalog-card bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300" data-category="padi">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold">Biomassa Padi</span>
+                        <span class="text-xs font-semibold text-slate-500"><i class="fa-solid fa-boxes-stacked mr-1"></i>Min. 5 Ton</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-1">Sekam Padi Terkompresi</h3>
+                    <p class="text-slate-500 text-xs mb-6">Sekam padi hasil gilingan padi kering dengan densitas tinggi.</p>
+                    
+                    <div class="space-y-2.5 bg-slate-50 p-4 rounded-2xl mb-6 text-xs sm:text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Nilai Kalor (Gross):</span>
+                            <span class="font-bold text-slate-800">3.800 - 4.100 Kcal/kg</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Kadar Air (Moisture):</span>
+                            <span class="font-bold text-slate-800">&le; 12 %</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Kadar Abu (Ash Content):</span>
+                            <span class="font-bold text-slate-800">14 - 16 %</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Bentuk Fisik:</span>
+                            <span class="font-bold text-brand-600">Curah / Bal Terkompresi</span>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="selectWasteType('Sekam Padi Terkompresi')" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-brand-600 text-white font-bold text-xs transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-calculator"></i> Hitung Potensi Ekonomi
+                    </button>
+                </div>
+
+                <!-- Item 2: Briket Batang Jagung -->
+                <div class="catalog-card bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300" data-category="jagung">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">Biomassa Jagung</span>
+                        <span class="text-xs font-semibold text-slate-500"><i class="fa-solid fa-boxes-stacked mr-1"></i>Min. 2 Ton</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-1">Briket Batang & Tongkol Jagung</h3>
+                    <p class="text-slate-500 text-xs mb-6">Hasil perajangan & pencacahan batang jagung pasca panen.</p>
+                    
+                    <div class="space-y-2.5 bg-slate-50 p-4 rounded-2xl mb-6 text-xs sm:text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Nilai Kalor (Gross):</span>
+                            <span class="font-bold text-slate-800">4.100 - 4.350 Kcal/kg</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Kadar Air (Moisture):</span>
+                            <span class="font-bold text-slate-800">&le; 10 %</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Kadar Abu (Ash Content):</span>
+                            <span class="font-bold text-slate-800">5 - 7 %</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Bentuk Fisik:</span>
+                            <span class="font-bold text-brand-600">Briket Silindris / Pellet</span>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="selectWasteType('Briket Batang Jagung')" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-brand-600 text-white font-bold text-xs transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-calculator"></i> Hitung Potensi Ekonomi
+                    </button>
+                </div>
+
+                <!-- Item 3: Pelet Cangkang Sawit -->
+                <div class="catalog-card bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300" data-category="sawit">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="px-3 py-1 rounded-full bg-orange-50 text-orange-700 border border-orange-200 text-xs font-bold">Biomassa Sawit</span>
+                        <span class="text-xs font-semibold text-slate-500"><i class="fa-solid fa-boxes-stacked mr-1"></i>Min. 10 Ton</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-1">Cangkang Sawit Terpilih (PKS)</h3>
+                    <p class="text-slate-500 text-xs mb-6">Cangkang kelapa sawit kering kadar air rendah untuk boiler.</p>
+                    
+                    <div class="space-y-2.5 bg-slate-50 p-4 rounded-2xl mb-6 text-xs sm:text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Nilai Kalor (Gross):</span>
+                            <span class="font-bold text-slate-800">4.300 - 4.600 Kcal/kg</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Kadar Air (Moisture):</span>
+                            <span class="font-bold text-slate-800">&le; 14 %</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Kadar Abu (Ash Content):</span>
+                            <span class="font-bold text-slate-800">3 - 5 %</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Bentuk Fisik:</span>
+                            <span class="font-bold text-brand-600">Pecahan Cangkang Alami</span>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="selectWasteType('Cangkang Sawit')" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-brand-600 text-white font-bold text-xs transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-calculator"></i> Hitung Potensi Ekonomi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: Verifikator Digital Waste Passport -->
+    <section id="paspor-digital" class="py-20 bg-white border-t border-slate-200/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden">
+                <!-- Decorative Glows -->
+                <div class="absolute -top-24 -right-24 w-96 h-96 bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="grid lg:grid-cols-12 gap-10 items-center relative z-10">
+                    <div class="lg:col-span-6 space-y-6">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/20 border border-brand-400/30 text-brand-300 text-xs font-bold">
+                            <i class="fa-solid fa-shield-check"></i> Sistem Jaminan Mutu Transparan
+                        </div>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                            Verifikasi Keaslian & Kualitas <span class="text-brand-400">Digital Waste Passport</span>
+                        </h2>
+                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                            Setiap muatan limbah pertanian yang dikirim melalui PadaTani dilengkapi dengan nomor paspor unik, hasil uji lab independen, jejak karbon, serta titik koordinat asal muatan.
+                        </p>
+
+                        <!-- Passport Search Form -->
+                        <div class="space-y-3 pt-2">
+                            <label class="block text-xs font-semibold uppercase text-slate-400 tracking-wider">Masukkan ID Paspor Digital / Scan QR</label>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <div class="relative flex-1">
+                                    <i class="fa-solid fa-barcode absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                    <input type="text" id="passport-id-input" placeholder="Contoh: PT-2026-SKM88" class="w-full pl-11 pr-4 py-3.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 text-sm font-mono">
+                                </div>
+                                <button type="button" onclick="verifyPassport()" class="px-6 py-3.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm shadow-lg shadow-brand-600/30 transition-all flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-magnifying-glass"></i> Verifikasi Paspor
+                                </button>
+                            </div>
+                            <!-- Sample Quick Click Passport Chips -->
+                            <div class="flex items-center gap-2 text-xs text-slate-400 pt-1">
+                                <span>Coba ID Sampel:</span>
+                                <button type="button" onclick="setAndVerify('PT-2026-SKM88')" class="text-brand-400 underline font-mono hover:text-brand-300">PT-2026-SKM88</button>
+                                <span>•</span>
+                                <button type="button" onclick="setAndVerify('PT-2026-JGG02')" class="text-brand-400 underline font-mono hover:text-brand-300">PT-2026-JGG02</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Passport Verification Result Card Display -->
+                    <div class="lg:col-span-6">
+                        <div id="passport-result" class="bg-slate-800/90 border border-slate-700 rounded-2xl p-6 sm:p-8 space-y-6">
+                            <!-- Default State Placeholder -->
+                            <div id="passport-placeholder" class="text-center py-8 space-y-3">
+                                <div class="w-16 h-16 rounded-2xl bg-slate-700/60 border border-slate-600 text-brand-400 flex items-center justify-center mx-auto text-2xl">
+                                    <i class="fa-solid fa-qrcode"></i>
+                                </div>
+                                <h4 class="font-bold text-slate-200">Menunggu Input ID Paspor</h4>
+                                <p class="text-xs text-slate-400 max-w-xs mx-auto">Ketik ID paspor di samping atau klik sampel ID di atas untuk melihat rincian sertifikasi batch limbah.</p>
+                            </div>
+
+                            <!-- Interactive Verified Details (Hidden initially) -->
+                            <div id="passport-details" class="hidden space-y-5">
+                                <div class="flex items-center justify-between pb-4 border-b border-slate-700">
+                                    <div>
+                                        <span class="px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold uppercase tracking-wider">Terverifikasi Resmi</span>
+                                        <h3 id="res-id" class="text-xl font-mono font-bold text-white mt-1">PT-2026-SKM88</h3>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-[11px] text-slate-400">Tanggal Pengujian</p>
+                                        <p id="res-date" class="text-xs font-semibold text-slate-200">24 September 2026</p>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4 text-xs">
+                                    <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-700/80">
+                                        <p class="text-slate-400">Komoditas Limbah</p>
+                                        <p id="res-commodity" class="font-bold text-white text-sm mt-0.5">Sekam Padi Terkompresi</p>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-700/80">
+                                        <p class="text-slate-400">Asal Kelompok Tani</p>
+                                        <p id="res-origin" class="font-bold text-white text-sm mt-0.5">Poktan Makmur Subang</p>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-700/80">
+                                        <p class="text-slate-400">Hub Pengolah</p>
+                                        <p id="res-hub" class="font-bold text-white text-sm mt-0.5">Agri Hub Karawang-1</p>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-700/80">
+                                        <p class="text-slate-400">Kadar Air (Lab)</p>
+                                        <p id="res-moisture" class="font-bold text-emerald-400 text-sm mt-0.5">11.4 % (Lulus SNI)</p>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 rounded-xl bg-brand-950/80 border border-brand-500/30 flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-lg bg-brand-600 text-white flex items-center justify-center shrink-0">
+                                        <i class="fa-solid fa-leaf text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-brand-300">Estimasi Pengurangan Jejak Karbon</p>
+                                        <p id="res-co2" class="text-sm font-extrabold text-white">1.84 Ton CO₂e Offset</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: Kalkulator Potensi Ekonomi Limbah -->
+    <section id="kalkulator" class="py-20 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <span class="text-xs font-bold tracking-widest text-brand-600 uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-200">Simulasi Pendapatan Real-Time</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3 tracking-tight">Kalkulator Potensi Ekonomi Limbah</h2>
+                <p class="text-slate-600 mt-2 text-base">Hitung perkiraan pendapatan bersih petani dan reduksi emisi karbon berdasarkan tonase dan lokasi limbah Anda.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-8 items-start">
+                <!-- Calculator Inputs -->
+                <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-lg space-y-6">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-800 mb-2">1. Pilih Jenis Limbah Pertanian</label>
+                        <select id="calc-type" onchange="calculatePotential()" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-800 font-semibold text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <option value="sekam">Sekam Padi (Est. Rp 450.000 / Ton)</option>
+                            <option value="jagung">Batang & Tongkol Jagung (Est. Rp 520.000 / Ton)</option>
+                            <option value="sawit">Cangkang Sawit (Est. Rp 780.000 / Ton)</option>
+                        </select>
+                    </div>
+
+                    <!-- Range Slider 1: Tonnage -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-bold text-slate-800">2. Estimasi Volume Tonase (Ton / Bulan)</label>
+                            <span id="calc-tonnage-val" class="px-3 py-1 bg-brand-100 text-brand-800 font-extrabold text-sm rounded-lg">25 Ton</span>
+                        </div>
+                        <input type="range" id="calc-tonnage" min="1" max="200" value="25" oninput="calculatePotential()" class="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600">
+                        <div class="flex justify-between text-[11px] text-slate-400 mt-1">
+                            <span>1 Ton</span>
+                            <span>100 Ton</span>
+                            <span>200 Ton</span>
+                        </div>
+                    </div>
+
+                    <!-- Range Slider 2: Moisture Level -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-bold text-slate-800">3. Estimated Moisture Level (%)</label>
+                            <span id="calc-moisture-val" class="px-3 py-1 bg-slate-100 text-slate-800 font-bold text-sm rounded-lg">15 %</span>
+                        </div>
+                        <input type="range" id="calc-moisture" min="10" max="45" value="15" oninput="calculatePotential()" class="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600">
+                        <div class="flex justify-between text-[11px] text-slate-400 mt-1">
+                            <span>10% (Kering Briket)</span>
+                            <span>25% (Standar)</span>
+                            <span>45% (Basah Panen)</span>
+                        </div>
+                    </div>
+
+                    <!-- Range Slider 3: Logistics Distance -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-sm font-bold text-slate-800">4. Jarak ke Agri Hub Terdekat (Km)</label>
+                            <span id="calc-distance-val" class="px-3 py-1 bg-slate-100 text-slate-800 font-bold text-sm rounded-lg">18 Km</span>
+                        </div>
+                        <input type="range" id="calc-distance" min="2" max="100" value="18" oninput="calculatePotential()" class="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600">
+                        <div class="flex justify-between text-[11px] text-slate-400 mt-1">
+                            <span>2 Km</span>
+                            <span>50 Km</span>
+                            <span>100 Km</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calculator Outputs Summary Card -->
+                <div class="lg:col-span-5 bg-gradient-to-br from-brand-900 via-brand-800 to-emerald-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-6">
+                    <div class="flex items-center justify-between pb-4 border-b border-brand-700/60">
+                        <div>
+                            <p class="text-xs font-semibold text-brand-300 uppercase tracking-wider">Hasil Proyeksi</p>
+                            <h3 class="text-lg font-bold text-white">Estimasi Hasil Finansial</h3>
+                        </div>
+                        <i class="fa-solid fa-coins text-2xl text-brand-300"></i>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-xs text-brand-200">Pendapatan Kotor Komoditas:</p>
+                            <p id="res-gross" class="text-2xl font-black text-white">Rp 11.250.000</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div class="p-3 rounded-xl bg-brand-950/60 border border-brand-700/50">
+                                <p class="text-brand-300">Est. Biaya Logistik:</p>
+                                <p id="res-logistic" class="text-sm font-bold text-rose-300 mt-0.5">Rp 1.350.000</p>
+                            </div>
+                            <div class="p-3 rounded-xl bg-brand-950/60 border border-brand-700/50">
+                                <p class="text-brand-300">Poin Kredit Tani:</p>
+                                <p id="res-points" class="text-sm font-bold text-amber-300 mt-0.5">+250 Poin</p>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-white text-slate-900 shadow-md">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pendapatan Bersih Petani / Poktan</p>
+                            <p id="res-net" class="text-3xl font-extrabold text-brand-700 mt-1">Rp 9.900.000</p>
+                            <p class="text-[11px] text-slate-500 mt-1">*Sudah dipotong penyesuaian kelembapan dan logistik.</p>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-emerald-800/60 border border-emerald-600/40 flex items-center justify-between text-xs">
+                            <span class="text-emerald-100"><i class="fa-solid fa-cloud-arrow-down mr-1"></i>Reduksi CO₂e Offset:</span>
+                            <span id="res-carbon" class="font-extrabold text-white text-sm">3.75 Ton</span>
+                        </div>
+                    </div>
+
+                    <a href="#kemitraan" class="block w-full py-3.5 rounded-xl bg-white hover:bg-brand-50 text-brand-800 font-extrabold text-center text-sm shadow-md transition-all">
+                        Daftarkan Limbah Ini Sekarang <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: Direktori Agri Hubs -->
+    <section id="agri-hubs" class="py-20 bg-white border-t border-slate-200/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <span class="text-xs font-bold tracking-widest text-brand-600 uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-200">Jaringan Sentra Pengolahan</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3 tracking-tight">Direktori Agri Hub Terdekat</h2>
+                <p class="text-slate-600 mt-2 text-base">Pusat penampungan dan pengolahan limbah biomassa beroperasi di wilayah strategis pertanian Indonesia.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Hub 1 -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 hover:border-brand-500 hover:shadow-lg transition-all space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold"><i class="fa-solid fa-circle text-[8px] mr-1"></i>Kapasitas 85%</span>
+                        <span class="text-xs text-slate-500">Jawa Barat</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900">Agri Hub Karawang-1</h3>
+                    <p class="text-xs text-slate-500"><i class="fa-solid fa-location-dot mr-1.5 text-brand-600"></i>Kawasan Industri Agrikultur Karawang Timur</p>
+                    <div class="pt-2 text-xs space-y-1.5 text-slate-600">
+                        <p><strong>Komoditas Utama:</strong> Sekam Padi & Batang Jagung</p>
+                        <p><strong>Fasilitas:</strong> Dryer Raksasa, Pelleting Line, Lab Moisture</p>
+                    </div>
+                    <button type="button" onclick="showToast('Menghubungkan ke Admin Agri Hub Karawang-1...')" class="w-full py-2.5 rounded-xl border border-slate-300 hover:border-brand-600 hover:text-brand-600 text-slate-700 font-bold text-xs transition-colors">
+                        Hubungi Manager Hub
+                    </button>
+                </div>
+
+                <!-- Hub 2 -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 hover:border-brand-500 hover:shadow-lg transition-all space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold"><i class="fa-solid fa-circle text-[8px] mr-1"></i>Kapasitas 90%</span>
+                        <span class="text-xs text-slate-500">Jawa Timur</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900">Agri Hub Malang-South</h3>
+                    <p class="text-xs text-slate-500"><i class="fa-solid fa-location-dot mr-1.5 text-brand-600"></i>Kepanjen, Kabupaten Malang</p>
+                    <div class="pt-2 text-xs space-y-1.5 text-slate-600">
+                        <p><strong>Komoditas Utama:</strong> Tongkol Jagung & Pelet Biomassa</p>
+                        <p><strong>Fasilitas:</strong> Shredder Heavy Duty, Briketing Press</p>
+                    </div>
+                    <button type="button" onclick="showToast('Menghubungkan ke Admin Agri Hub Malang...')" class="w-full py-2.5 rounded-xl border border-slate-300 hover:border-brand-600 hover:text-brand-600 text-slate-700 font-bold text-xs transition-colors">
+                        Hubungi Manager Hub
+                    </button>
+                </div>
+
+                <!-- Hub 3 -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 hover:border-brand-500 hover:shadow-lg transition-all space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold"><i class="fa-solid fa-circle text-[8px] mr-1"></i>Kapasitas 60%</span>
+                        <span class="text-xs text-slate-500">Lampung</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900">Agri Hub Lampung Tengah</h3>
+                    <p class="text-xs text-slate-500"><i class="fa-solid fa-location-dot mr-1.5 text-brand-600"></i>Terbanggi Besar, Lampung Tengah</p>
+                    <div class="pt-2 text-xs space-y-1.5 text-slate-600">
+                        <p><strong>Komoditas Utama:</strong> Cangkang Sawit & Sekam Padi</p>
+                        <p><strong>Fasilitas:</strong> Weighbridge 50T, Sorter & Screener</p>
+                    </div>
+                    <button type="button" onclick="showToast('Menghubungkan ke Admin Agri Hub Lampung...')" class="w-full py-2.5 rounded-xl border border-slate-300 hover:border-brand-600 hover:text-brand-600 text-slate-700 font-bold text-xs transition-colors">
+                        Hubungi Manager Hub
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: Formulir Pendaftaran Kemitraan -->
+    <section id="kemitraan" class="py-20 bg-slate-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200 shadow-xl space-y-8">
+                <div class="text-center space-y-2">
+                    <span class="text-xs font-bold tracking-widest text-brand-600 uppercase bg-brand-50 px-3 py-1 rounded-full border border-brand-200">Bergabung Bersama Ekosistem</span>
+                    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Formulir Pendaftaran Kemitraan</h2>
+                    <p class="text-slate-600 text-sm">Pilih peran Anda dan isi formulir di bawah ini untuk memulai integrasi pasokan.</p>
+                </div>
+
+                <form id="partnership-form" onsubmit="submitForm(event)" class="space-y-6">
+                    <!-- Role Selection Tabs -->
+                    <div class="grid grid-cols-3 gap-3 p-1.5 bg-slate-100 rounded-2xl">
+                        <button type="button" onclick="setRole('Petani / Poktan', this)" class="role-btn active py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-800 shadow-sm transition-all">Petani / Poktan</button>
+                        <button type="button" onclick="setRole('Pengelola Agri Hub', this)" class="role-btn py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 transition-all">Pengelola Agri Hub</button>
+                        <button type="button" onclick="setRole('Pembeli Industri B2B', this)" class="role-btn py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 transition-all">Pembeli B2B</button>
+                    </div>
+                    <input type="hidden" id="selected-role" value="Petani / Poktan">
+
+                    <div class="grid sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Nama Lengkap / Nama Organisasi</label>
+                            <input type="text" required placeholder="Contoh: Budi Santoso / Poktan Tani Jaya" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-800 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Nomor WhatsApp / Telepon</label>
+                            <input type="tel" required placeholder="Contoh: 081234567890" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-800 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Wilayah / Kabupaten</label>
+                            <input type="text" required placeholder="Contoh: Subang, Jawa Barat" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-800 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Estimasi Kapasitas / Kebutuhan (Ton/Bulan)</label>
+                            <input type="number" required placeholder="Contoh: 20" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-800 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Catatan Tambahan (Kondisi Limbah / Spesifikasi)</label>
+                        <textarea rows="3" placeholder="Jelaskan kondisi lokasi penampungan, kadar air perkiraan, atau pertanyaan..." class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-800 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full py-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-base shadow-lg shadow-brand-600/30 transition-all">
+                        Kirim Pendaftaran Kemitraan
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="bg-slate-900 text-slate-400 py-16 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-slate-800">
+                <div class="space-y-4 md:col-span-1">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white font-bold">
+                            <i class="fa-solid fa-leaf"></i>
+                        </div>
+                        <span class="text-xl font-extrabold text-white">Pada<span class="text-brand-500">Tani</span></span>
+                    </div>
+                    <p class="text-xs leading-relaxed text-slate-400">
+                        Platform integrasi ekosistem limbah agrikultur nasional terpercaya dengan standardisasi Digital Waste Passport.
                     </p>
                 </div>
 
-                <!-- Navigation Links -->
-                <div class="md:col-span-3 space-y-3 text-xs">
-                    <h5 class="font-bold text-lime-accent uppercase tracking-wider">Halaman Fitur</h5>
-                    <ul class="space-y-2 text-emerald-100">
-                        <li><a href="javascript:void(0)" onclick="switchPage('page-home')" class="hover:text-white">Beranda Platform</a></li>
-                        <li><a href="javascript:void(0)" onclick="switchPage('page-platform')" class="hover:text-white">Detail Arsitektur 4 Pilar</a></li>
-                        <li><a href="javascript:void(0)" onclick="switchPage('page-calculator')" class="hover:text-white">Kalkulator Potensi Limbah</a></li>
-                        <li><a href="javascript:void(0)" onclick="switchPage('page-passport')" class="hover:text-white">Waste Passport Digital</a></li>
-                        <li><a href="javascript:void(0)" onclick="switchPage('page-hubs')" class="hover:text-white">Jaringan Agri Hubs</a></li>
+                <div>
+                    <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Navigasi Utama</h4>
+                    <ul class="space-y-2.5 text-xs">
+                        <li><a href="#alur-kerja" class="hover:text-brand-400 transition-colors">Alur Kerja Ekosistem</a></li>
+                        <li><a href="#katalog" class="hover:text-brand-400 transition-colors">Katalog & Spesifikasi</a></li>
+                        <li><a href="#paspor-digital" class="hover:text-brand-400 transition-colors">Verifikasi Paspor Digital</a></li>
+                        <li><a href="#kalkulator" class="hover:text-brand-400 transition-colors">Kalkulator Potensi Limbah</a></li>
                     </ul>
                 </div>
 
-                <!-- Contact & Direct Support -->
-                <div class="md:col-span-4 space-y-3 text-xs">
-                    <h5 class="font-bold text-lime-accent uppercase tracking-wider">Kontak & Layanan Direct</h5>
-                    <div class="space-y-2 text-emerald-100">
-                        <p class="flex items-center gap-2.5">
-                            <i class="fa-solid fa-envelope text-lime-accent"></i>
-                            <a href="mailto:drupadilathifa@gmail.com" class="hover:underline">drupadilathifa@gmail.com</a>
-                        </p>
-                        <p class="flex items-center gap-2.5">
-                            <i class="fa-brands fa-whatsapp text-lime-accent"></i>
-                            <a href="https://wa.me/6281334349522" target="_blank" class="hover:underline">0813-3434-9522 (WhatsApp)</a>
-                        </p>
-                        <p class="flex items-center gap-2.5">
-                            <i class="fa-solid fa-location-dot text-lime-accent"></i>
-                            <span>Hub Utama: Surabaya & Malang, Jawa Timur</span>
-                        </p>
-                    </div>
+                <div>
+                    <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Program & Mitra</h4>
+                    <ul class="space-y-2.5 text-xs">
+                        <li><a href="#agri-hubs" class="hover:text-brand-400 transition-colors">Jaringan Agri Hubs</a></li>
+                        <li><a href="#kemitraan" class="hover:text-brand-400 transition-colors">Pendaftaran Poktan</a></li>
+                        <li><a href="#kemitraan" class="hover:text-brand-400 transition-colors">Kemitraan Industri Offtaker</a></li>
+                        <li><a href="#" onclick="showToast('Sistem Kredit Karbon sedang dalam pengembangan.'); return false;" class="hover:text-brand-400 transition-colors">Kredit Karbon Biomassa</a></li>
+                    </ul>
                 </div>
 
+                <div>
+                    <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Kontak Layanan</h4>
+                    <ul class="space-y-2.5 text-xs">
+                        <li><i class="fa-solid fa-envelope mr-2 text-brand-500"></i> support@padatani.id</li>
+                        <li><i class="fa-solid fa-phone mr-2 text-brand-500"></i> +62 (021) 8899-7700</li>
+                        <li><i class="fa-solid fa-location-dot mr-2 text-brand-500"></i> Jakarta & Karawang, Indonesia</li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="pt-8 border-t border-emerald-900/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-emerald-300">
-                <p>&copy; 2026 PadaTani. Hak Cipta Dilindungi Undang-Undang.</p>
-                <div class="flex gap-4">
-                    <a href="javascript:void(0)" onclick="showToast('Kebijakan Privasi PadaTani aktif dan dilindungi.', 'info')" class="hover:text-white">Kebijakan Privasi</a>
-                    <a href="javascript:void(0)" onclick="showToast('Syarat & Ketentuan Lisensi Platform 2026.', 'info')" class="hover:text-white">Syarat & Ketentuan</a>
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+                <p>&copy; 2026 PadaTani. Seluruh hak cipta dilindungi undang-undang.</p>
+                <div class="flex gap-6">
+                    <a href="#" onclick="showToast('Kebijakan Privasi PadaTani'); return false;" class="hover:text-slate-400">Kebijakan Privasi</a>
+                    <a href="#" onclick="showToast('Syarat & Ketentuan Layanan'); return false;" class="hover:text-slate-400">Syarat & Ketentuan</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <!-- Floating Mascot Assistant Trigger Button (Bottom Right) -->
+    <button id="mascot-btn" onclick="toggleChatWindow()" class="fixed bottom-5 right-5 z-[999990] animate-float group bg-gradient-to-tr from-brand-700 via-brand-600 to-emerald-500 text-white p-3.5 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 flex items-center gap-3 border-2 border-white/80" aria-label="Buka Asisten Si Tani">
+        <div class="relative w-10 h-10 rounded-full bg-white text-brand-600 flex items-center justify-center font-extrabold text-xl shadow-inner">
+            <i class="fa-solid fa-droplet text-brand-600"></i>
+            <span class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-400 border-2 border-white rounded-full"></span>
+        </div>
+        <span class="hidden sm:inline font-bold text-xs pr-2">Tanya Si Tani</span>
+    </button>
+
+    <!-- Floating Chat Window (FIXED REQUIREMENT: Positioned ABOVE Mascot Button with high Z-Index) -->
+    <div id="chat-window" class="hidden fixed bottom-[90px] right-5 z-[999999] w-[360px] max-w-[calc(100vw-32px)] max-h-[calc(100vh-120px)] bg-white rounded-3xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden transition-all duration-300">
+        <!-- Chat Header -->
+        <div class="bg-gradient-to-r from-brand-700 to-emerald-600 p-4 text-white flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-lg font-bold border border-white/30">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm leading-tight">Si Tani (PadaBot)</h4>
+                    <p class="text-[11px] text-brand-100 flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span> Asisten Ekosistem Limbah
+                    </p>
+                </div>
+            </div>
+            <button type="button" onclick="toggleChatWindow()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Scrollable Messages Container -->
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 text-xs min-h-[220px]">
+            <!-- Bot Welcome Message -->
+            <div class="flex items-start gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                    <i class="fa-solid fa-leaf"></i>
+                </div>
+                <div class="bg-white p-3 rounded-2xl rounded-tl-none border border-slate-200 text-slate-800 shadow-xs space-y-1 max-w-[85%]">
+                    <p class="font-bold text-brand-700 text-[11px]">Si Tani</p>
+                    <p>Halo! Saya Si Tani. Ada yang bisa saya bantu terkait harga limbah, kalkulator potensi, atau pendaftaran mitra?</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Suggestion Chips -->
+        <div class="p-2.5 bg-white border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto whitespace-nowrap shrink-0 text-[11px]">
+            <button type="button" onclick="sendQuickMessage('Berapa harga sekam padi?')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-600 font-semibold border border-slate-200 transition-colors">Harga Sekam?</button>
+            <button type="button" onclick="sendQuickMessage('Cara cek Paspor Digital?')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-600 font-semibold border border-slate-200 transition-colors">Paspor Digital?</button>
+            <button type="button" onclick="sendQuickMessage('Bagaimana cara gabung Poktan?')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-brand-50 hover:text-brand-700 text-slate-600 font-semibold border border-slate-200 transition-colors">Cara Daftar?</button>
+        </div>
+
+        <!-- Chat Input Form -->
+        <div class="p-3 bg-white border-t border-slate-200 shrink-0">
+            <form onsubmit="handleChatSubmit(event)" class="flex gap-2">
+                <input type="text" id="chat-input" placeholder="Tulis pertanyaan Anda..." class="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-800 focus:outline-none focus:border-brand-500 bg-slate-50">
+                <button type="submit" class="w-9 h-9 rounded-xl bg-brand-600 hover:bg-brand-700 text-white flex items-center justify-center shrink-0 transition-colors">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[9999999] pointer-events-none flex flex-col gap-2"></div>
+
     <script>
-        // Custom Non-blocking Toast Notification (replaces browser alert())
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            if (!container) return;
+        
+        // Navigation Mobile Menu Toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
 
+        // Close mobile menu on clicking links
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('mobile-menu').classList.add('hidden');
+            });
+        });
+
+        // Toggle Chat Popup Window
+        function toggleChatWindow() {
+            const windowEl = document.getElementById('chat-window');
+            windowEl.classList.toggle('hidden');
+            if (!windowEl.classList.contains('hidden')) {
+                document.getElementById('chat-input').focus();
+            }
+        }
+
+        // Custom Toast Notification System
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg border text-xs font-semibold flex items-center gap-3 transform translate-x-8 opacity-0 transition-all duration-300 ${
-                type === 'success' ? 'bg-emerald-900 text-white border-emerald-500' :
-                type === 'info' ? 'bg-slate-900 text-white border-slate-700' : 'bg-amber-900 text-white border-amber-500'
+            toast.className = `pointer-events-auto px-4 py-3 rounded-2xl shadow-xl text-xs font-bold text-white flex items-center gap-3 transition-all duration-300 transform translate-y-2 opacity-0 ${
+                type === 'error' ? 'bg-rose-600' : 'bg-slate-900 border border-slate-700'
             }`;
-
-            const iconClass = type === 'success' ? 'fa-circle-check text-lime-accent' :
-                              type === 'info' ? 'fa-circle-info text-sky-400' : 'fa-triangle-exclamation text-amber-400';
-
-            toast.innerHTML = `
-                <i class="fa-solid ${iconClass} text-sm"></i>
-                <span>${message}</span>
-            `;
-
+            
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-brand-400 text-sm"></i><span>${message}</span>`;
             container.appendChild(toast);
 
             // Animate In
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-x-8', 'opacity-0');
-            });
-
-            // Auto Dismiss
             setTimeout(() => {
-                toast.classList.add('translate-x-8', 'opacity-0');
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            // Animate Out & Remove
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
                 setTimeout(() => toast.remove(), 300);
             }, 3500);
         }
 
-        // SPA Page Router
-        function switchPage(pageId) {
-            document.querySelectorAll('.page-content').forEach(page => {
-                page.classList.add('hidden');
+        // Catalog Tab Filtering
+        function filterCatalog(category, btnElement) {
+            document.querySelectorAll('.catalog-tab').forEach(tab => {
+                tab.classList.remove('bg-brand-600', 'text-white');
+                tab.classList.add('bg-white', 'text-slate-600', 'border', 'border-slate-200');
             });
+            btnElement.classList.remove('bg-white', 'text-slate-600', 'border', 'border-slate-200');
+            btnElement.classList.add('bg-brand-600', 'text-white');
 
-            const targetPage = document.getElementById(pageId);
-            if (targetPage) {
-                targetPage.classList.remove('hidden');
-            }
-
-            // Update Navigation Links
-            document.querySelectorAll('.nav-link').forEach(link => {
-                const indicator = link.querySelector('.active-indicator');
-                if (link.getAttribute('data-page') === pageId) {
-                    link.classList.add('text-primary', 'font-semibold');
-                    link.classList.remove('text-slate-600');
-                    if (indicator) indicator.classList.remove('hidden');
+            const cards = document.querySelectorAll('.catalog-card');
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
                 } else {
-                    link.classList.remove('text-primary', 'font-semibold');
-                    link.classList.add('text-slate-600');
-                    if (indicator) indicator.classList.add('hidden');
+                    card.style.display = 'none';
                 }
             });
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Toggle Mobile Menu Drawer
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            menu.classList.toggle('hidden');
+        // Select Waste Type from Catalog into Calculator
+        function selectWasteType(typeName) {
+            const selectEl = document.getElementById('calc-type');
+            if (typeName.includes('Sekam')) selectEl.value = 'sekam';
+            else if (typeName.includes('Jagung')) selectEl.value = 'jagung';
+            else if (typeName.includes('Sawit')) selectEl.value = 'sawit';
+
+            calculatePotential();
+            document.getElementById('kalkulator').scrollIntoView({ behavior: 'smooth' });
+            showToast(`Memilih komoditas: ${typeName}`);
         }
 
-        function setPartnershipTab(type) {
-            const farmerForm = document.getElementById('farmerForm');
-            const industryForm = document.getElementById('industryForm');
-            const tabPetaniBtn = document.getElementById('tabPetaniBtn');
-            const tabIndustriBtn = document.getElementById('tabIndustriBtn');
+        // Calculate Potential Economic Yields
+        function calculatePotential() {
+            const type = document.getElementById('calc-type').value;
+            const tonnage = parseInt(document.getElementById('calc-tonnage').value);
+            const moisture = parseInt(document.getElementById('calc-moisture').value);
+            const distance = parseInt(document.getElementById('calc-distance').value);
 
-            if (type === 'petani') {
-                farmerForm.classList.remove('hidden');
-                industryForm.classList.add('hidden');
-                tabPetaniBtn.classList.add('bg-white', 'text-emerald-dark', 'shadow-sm');
-                tabPetaniBtn.classList.remove('text-slate-600');
-                tabIndustriBtn.classList.remove('bg-white', 'text-emerald-dark', 'shadow-sm');
-                tabIndustriBtn.classList.add('text-slate-600');
-            } else {
-                industryForm.classList.remove('hidden');
-                farmerForm.classList.add('hidden');
-                tabIndustriBtn.classList.add('bg-white', 'text-emerald-dark', 'shadow-sm');
-                tabIndustriBtn.classList.remove('text-slate-600');
-                tabPetaniBtn.classList.remove('bg-white', 'text-emerald-dark', 'shadow-sm');
-                tabPetaniBtn.classList.add('text-slate-600');
-            }
-        }
+            // Update range slider text badges
+            document.getElementById('calc-tonnage-val').innerText = `${tonnage} Ton`;
+            document.getElementById('calc-moisture-val').innerText = `${moisture} %`;
+            document.getElementById('calc-distance-val').innerText = `${distance} Km`;
 
-        // Calculator Multi-Parameter State
-        let selectedCommodityData = {
-            pricePerTon: 250000,
-            pointsPerTon: 150,
-            co2PerTon: 1.2
-        };
+            // Base pricing per ton
+            let basePricePerTon = 450000; // default sekam
+            if (type === 'jagung') basePricePerTon = 520000;
+            if (type === 'sawit') basePricePerTon = 780000;
 
-        function selectCommodity(type, element) {
-            document.querySelectorAll('.commodity-btn').forEach(btn => {
-                btn.classList.remove('border-2', 'border-primary', 'bg-emerald-50/50');
-                btn.classList.add('border-slate-200');
-            });
-
-            element.classList.add('border-2', 'border-primary', 'bg-emerald-50/50');
-            element.classList.remove('border-slate-200');
-
-            switch (type) {
-                case 'jerami':
-                    selectedCommodityData = { pricePerTon: 250000, pointsPerTon: 150, co2PerTon: 1.2 };
-                    break;
-                case 'sekam':
-                    selectedCommodityData = { pricePerTon: 350000, pointsPerTon: 200, co2PerTon: 1.5 };
-                    break;
-                case 'jagung':
-                    selectedCommodityData = { pricePerTon: 400000, pointsPerTon: 220, co2PerTon: 1.6 };
-                    break;
-                case 'tebu':
-                    selectedCommodityData = { pricePerTon: 380000, pointsPerTon: 210, co2PerTon: 1.4 };
-                    break;
-                case 'kelapa':
-                    selectedCommodityData = { pricePerTon: 450000, pointsPerTon: 250, co2PerTon: 1.8 };
-                    break;
-            }
-
-            updateCalculator();
-        }
-
-        function updateCalculator() {
-            const tonnage = parseInt(document.getElementById('tonnageSlider').value) || 25;
-            const moisture = parseInt(document.getElementById('moistureSlider').value) || 14;
-            const distance = parseInt(document.getElementById('distanceSlider').value) || 15;
-
-            // Update Label Displays
-            document.getElementById('tonnageValueDisplay').innerText = tonnage + ' Ton';
-            document.getElementById('moistureValueDisplay').innerText = moisture + '% ' + (moisture <= 14 ? '(Standar Super)' : moisture <= 25 ? '(Sedang)' : '(Kadar Tinggi)');
-            document.getElementById('distanceValueDisplay').innerText = distance + ' km';
-
-            // Land area helper calculation
-            const estimatedHectares = Math.ceil(tonnage / 5);
-            document.getElementById('estimatedAreaDisplay').innerText = `~ ${estimatedHectares} Hektar Lahan Panen`;
-
-            // Gross Price adjustment based on moisture (% quality penalty if > 15%)
+            // Penalty / Adjustment factor based on moisture (>15% reduces value slightly)
             let moistureFactor = 1.0;
             if (moisture > 15) {
-                moistureFactor = 1.0 - ((moisture - 15) * 0.012);
+                moistureFactor = 1.0 - ((moisture - 15) * 0.015);
             }
-            const adjustedPricePerTon = selectedCommodityData.pricePerTon * moistureFactor;
-            const grossIncome = tonnage * adjustedPricePerTon;
 
-            // Logistics transport deduction (e.g. Rp 2,000 per ton per km)
-            const logisticsCost = tonnage * distance * 2000;
-            const netIncome = Math.max(0, grossIncome - logisticsCost);
+            const gross = Math.round(tonnage * basePricePerTon * moistureFactor);
+            const logisticCost = Math.round(tonnage * (distance * 3000)); // Rp 3000/ton/km
+            const net = Math.max(0, gross - logisticCost);
+            const points = tonnage * 10;
+            const carbonOffset = (tonnage * 0.15).toFixed(2);
 
-            const totalPoints = Math.round(tonnage * selectedCommodityData.pointsPerTon);
-            const totalCO2 = (tonnage * selectedCommodityData.co2PerTon).toFixed(1);
-
-            // Update UI Output Displays
-            document.getElementById('incomeResult').innerText = 'Rp ' + Math.round(netIncome).toLocaleString('id-ID');
-            document.getElementById('logisticsBreakdown').innerText = `Kotor: Rp ${Math.round(grossIncome).toLocaleString('id-ID')} | Logistik Trans: -Rp ${Math.round(logisticsCost).toLocaleString('id-ID')}`;
-            document.getElementById('pointsResult').innerText = totalPoints.toLocaleString('id-ID') + ' PTS';
-            document.getElementById('co2Result').innerText = totalCO2 + ' Ton CO2e';
-
-            // Environmental equivalence text
-            const vehicleEquiv = Math.round(totalCO2 * 0.4);
-            document.getElementById('impactEquivDisplay').innerText = `Setara meniadakan emisi dari ${vehicleEquiv} unit kendaraan bermotor per tahun.`;
+            // Render Output Text
+            document.getElementById('res-gross').innerText = `Rp ${gross.toLocaleString('id-ID')}`;
+            document.getElementById('res-logistic').innerText = `Rp ${logisticCost.toLocaleString('id-ID')}`;
+            document.getElementById('res-net').innerText = `Rp ${net.toLocaleString('id-ID')}`;
+            document.getElementById('res-points').innerText = `+${points} Poin`;
+            document.getElementById('res-carbon').innerText = `${carbonOffset} Ton CO₂e`;
         }
 
-        const sampleBatches = {
-            'BATCH-2026-JATIM-089': {
-                batchId: 'BATCH-2026-JATIM-089',
-                origin: 'Gapoktan Sri Rejeki, Malang - Jawa Timur',
-                commodity: 'Sekam Padi Pelet (80 Ton)',
-                date: '18 September 2026',
-                moisture: '11.4%',
-                calorific: '16.6 MJ/kg',
-                ash: '12.1%',
-                co2: '96.0 Ton CO2e'
+        // Passport Database Mock
+        const passportData = {
+            'PT-2026-SKM88': {
+                commodity: 'Sekam Padi Terkompresi',
+                origin: 'Poktan Makmur Subang',
+                hub: 'Agri Hub Karawang-1',
+                moisture: '11.4 % (Lulus SNI)',
+                co2: '1.84 Ton CO₂e Offset',
+                date: '24 September 2026'
             },
-            'BATCH-2026-JABAR-114': {
-                batchId: 'BATCH-2026-JABAR-114',
-                origin: 'Kelompok Tani Maju, Subang - Jawa Barat',
-                commodity: 'Tongkol Jagung Grit (120 Ton)',
-                date: '22 September 2026',
-                moisture: '9.8%',
-                calorific: '17.8 MJ/kg',
-                ash: '3.2%',
-                co2: '192.0 Ton CO2e'
-            },
-            'BATCH-2026-SUMSEL-042': {
-                batchId: 'BATCH-2026-SUMSEL-042',
-                origin: 'Koperasi Tani Makmur, Ogan Komering - Sumsel',
-                commodity: 'Ampas Tebu Briquet (150 Ton)',
-                date: '25 September 2026',
-                moisture: '12.0%',
-                calorific: '16.8 MJ/kg',
-                ash: '4.1%',
-                co2: '210.0 Ton CO2e'
+            'PT-2026-JGG02': {
+                commodity: 'Briket Batang Jagung',
+                origin: 'Kelompok Tani Tani Jaya Kepanjen',
+                hub: 'Agri Hub Malang-South',
+                moisture: '9.8 % (Super Dry)',
+                co2: '2.45 Ton CO₂e Offset',
+                date: '25 September 2026'
             }
         };
 
-        function verifyBatch() {
-            const inputVal = document.getElementById('batchIdInput').value.trim();
-            if (sampleBatches[inputVal]) {
-                displayBatchData(sampleBatches[inputVal]);
-                showToast(`Sertifikat ${inputVal} terverifikasi otentik!`, 'success');
-            } else {
-                showToast('ID Batch tidak ditemukan. Memuat sampel standar...', 'info');
-                displayBatchData(sampleBatches['BATCH-2026-JATIM-089']);
+        function setAndVerify(passportId) {
+            document.getElementById('passport-id-input').value = passportId;
+            verifyPassport();
+        }
+
+        function verifyPassport() {
+            const inputVal = document.getElementById('passport-id-input').value.trim().toUpperCase();
+            const placeholder = document.getElementById('passport-placeholder');
+            const details = document.getElementById('passport-details');
+
+            if (!inputVal) {
+                showToast('Harap masukkan ID Paspor Digital!', 'error');
+                return;
             }
+
+            const data = passportData[inputVal] || {
+                commodity: 'Pelet Biomassa Terverifikasi',
+                origin: 'Mitra Poktan Terdaftar',
+                hub: 'Agri Hub Lampung Tengah',
+                moisture: '12.0 % (Kualitas Unggul)',
+                co2: '1.50 Ton CO₂e Offset',
+                date: '26 September 2026'
+            };
+
+            document.getElementById('res-id').innerText = inputVal;
+            document.getElementById('res-commodity').innerText = data.commodity;
+            document.getElementById('res-origin').innerText = data.origin;
+            document.getElementById('res-hub').innerText = data.hub;
+            document.getElementById('res-moisture').innerText = data.moisture;
+            document.getElementById('res-co2').innerText = data.co2;
+            document.getElementById('res-date').innerText = data.date;
+
+            placeholder.classList.add('hidden');
+            details.classList.remove('hidden');
+            showToast(`Paspor Digital ${inputVal} berhasil diverifikasi!`);
         }
 
-        function loadSampleBatch(id) {
-            document.getElementById('batchIdInput').value = id;
-            displayBatchData(sampleBatches[id]);
-            showToast(`Memuat data sertifikat ${id}`, 'info');
+        function sendQuickMessage(text) {
+            document.getElementById('chat-input').value = text;
+            handleChatSubmit(new Event('submit'));
         }
 
-        function displayBatchData(data) {
-            document.getElementById('certBatchId').innerText = data.batchId;
-            document.getElementById('certOrigin').innerText = data.origin;
-            document.getElementById('certCommodity').innerText = data.commodity;
-            document.getElementById('certDate').innerText = data.date;
-            document.getElementById('certMoisture').innerText = data.moisture;
-            document.getElementById('certCalorific').innerText = data.calorific;
-            document.getElementById('certAsh').innerText = data.ash;
-            document.getElementById('certCO2').innerText = data.co2;
-        }
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('chat-input');
+            const msg = inputEl.value.trim();
+            if (!msg) return;
 
-        function filterHubs(region, element) {
-            document.querySelectorAll('.hub-filter-btn').forEach(btn => {
-                btn.classList.remove('bg-primary', 'text-white');
-                btn.classList.add('bg-white', 'text-slate-700', 'border', 'border-slate-200');
-            });
+            const messagesContainer = document.getElementById('chat-messages');
 
-            element.classList.add('bg-primary', 'text-white');
-            element.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+            // User Message
+            const userMsgHtml = `
+                <div class="flex items-start justify-end gap-2.5">
+                    <div class="bg-brand-600 text-white p-3 rounded-2xl rounded-tr-none shadow-xs max-w-[85%]">
+                        <p>${msg}</p>
+                    </div>
+                </div>
+            `;
+            messagesContainer.insertAdjacentHTML('beforeend', userMsgHtml);
+            inputEl.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-            document.querySelectorAll('.hub-card').forEach(card => {
-                if (region === 'all' || card.getAttribute('data-region') === region) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
-            });
-        }
-
-        // Chatbot Panel Toggle (Ensured DEFAULT CLOSED, ONLY OPENS ON CLICK)
-        function toggleTaniBot() {
-            const panel = document.getElementById('taniBotPanel');
-            panel.classList.toggle('hidden');
-        }
-
-        function botQuickAction(type) {
-            toggleTaniBot();
-            if (type === 'passport') {
-                switchPage('page-passport');
-            } else if (type === 'calc') {
-                switchPage('page-calculator');
-            }
-        }
-
-        function handleBotKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendBotMessage();
-            }
-        }
-
-        function sendBotMessage() {
-            const input = document.getElementById('botInputText');
-            const message = input.value.trim();
-            if (!message) return;
-
-            const chatContainer = document.getElementById('botChatContainer');
-
-            // User Message Bubble
-            const userBubble = document.createElement('div');
-            userBubble.className = 'p-3 rounded-xl bg-primary text-white text-xs self-end ml-auto max-w-[85%] shadow-sm';
-            userBubble.innerText = message;
-            chatContainer.appendChild(userBubble);
-
-            input.value = '';
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            // Bot Response Simulation
+            // Generate Bot Reply
             setTimeout(() => {
-                const botReply = document.createElement('div');
-                botReply.className = 'p-3 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs leading-relaxed shadow-sm';
-                
-                const lowerMsg = message.toLowerCase();
-                if (lowerMsg.includes('harga') || lowerMsg.includes('biaya') || lowerMsg.includes('income')) {
-                    botReply.innerHTML = '<strong>Si Tani:</strong> Harga limbah berkisar antara Rp 250k - Rp 450k per Ton tergantung jenis dan tingkat kelembapan. Coba <a href="javascript:void(0)" onclick="botQuickAction(\'calc\')" class="text-primary underline font-bold">Kalkulator Potensi</a> kami!';
-                } else if (lowerMsg.includes('daftar') || lowerMsg.includes('mitra') || lowerMsg.includes('hub')) {
-                    botReply.innerHTML = '<strong>Si Tani:</strong> Anda bisa mendaftar sebagai Mitra Petani atau Industri di menu <a href="javascript:void(0)" onclick="switchPage(\'page-kemitraan\'); toggleTaniBot();" class="text-primary underline font-bold">Pendaftaran Kemitraan</a>.';
-                } else {
-                    botReply.innerHTML = `<strong>Si Tani:</strong> Terima kasih atas pertanyaan Anda. Untuk konsultasi spesifik mengenai "${message}", tim support kami siap melayani melalui <a href="https://wa.me/6281334349522" target="_blank" class="text-emerald-600 underline font-bold">WhatsApp Direct (0813-3434-9522)</a>.`;
+                let botReply = "Terima kasih atas pertanyaannya! Anda dapat mengecek katalog limbah dan kalkulator di atas atau mendaftar formulir kemitraan.";
+                const lower = msg.toLowerCase();
+
+                if (lower.includes('harga') || lower.includes('sekam')) {
+                    botReply = "Harga rata-rata Sekam Padi Terkompresi berkisar antara Rp 450.000 / Ton tergantung kadar kelembapan dan lokasi pengiriman.";
+                } else if (lower.includes('paspor') || lower.includes('digital')) {
+                    botReply = "Digital Waste Passport memberikan sertifikasi uji laboratorium kadar air, nilai kalor, serta pelacakan jejak karbon CO2 untuk setiap batch pengiriman.";
+                } else if (lower.includes('daftar') || lower.includes('mitra')) {
+                    botReply = "Anda bisa langsung mendaftar melalui formulir Kemitraan di bagian bawah halaman ini. Pilih peran sebagai Petani, Hub, atau Pembeli B2B!";
                 }
 
-                chatContainer.appendChild(botReply);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
+                const botMsgHtml = `
+                    <div class="flex items-start gap-2.5">
+                        <div class="w-7 h-7 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                            <i class="fa-solid fa-leaf"></i>
+                        </div>
+                        <div class="bg-white p-3 rounded-2xl rounded-tl-none border border-slate-200 text-slate-800 shadow-xs space-y-1 max-w-[85%]">
+                            <p class="font-bold text-brand-700 text-[11px]">Si Tani</p>
+                            <p>${botReply}</p>
+                        </div>
+                    </div>
+                `;
+                messagesContainer.insertAdjacentHTML('beforeend', botMsgHtml);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }, 600);
         }
 
-        function handleFormSubmit(e, type) {
-            e.preventDefault();
-            showToast(`Pendaftaran ${type} berhasil dikirim! Tim PadaTani akan segera menghubungi Anda.`, 'success');
-            e.target.reset();
+        // Role Selector in Form
+        function setRole(roleName, btnEl) {
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-slate-800', 'shadow-sm');
+                btn.classList.add('text-slate-600');
+            });
+            btnEl.classList.add('bg-white', 'text-slate-800', 'shadow-sm');
+            btnEl.classList.remove('text-slate-600');
+            document.getElementById('selected-role').value = roleName;
         }
 
-        // On window initialization
+        // Partnership Form Submission
+        function submitForm(e) {
+            e.preventDefault();
+            const role = document.getElementById('selected-role').value;
+            showToast(`Pendaftaran kemitraan sebagai ${role} berhasil dikirim! Tim PadaTani akan menghubungi WhatsApp Anda.`);
+            document.getElementById('partnership-form').reset();
+        }
+
+        // Initial Calculation Trigger on Page Load
         window.onload = function() {
-            updateCalculator();
+            calculatePotential();
         };
     </script>
 </body>
