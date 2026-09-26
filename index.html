@@ -209,6 +209,8 @@
                             PadaTani menghubungkan petani, kelompok tani, dan hub pengolah limbah dengan pembeli industri B2B secara terstruktur, terstandarisasi, dan terverifikasi via <strong class="text-slate-800 font-semibold">Digital Waste Passport</strong>.
                         </p>
 
+                        <p class="text-sm sm:text-base font-bold text-brand-700 italic">"Bersama Tani, Bersama Untung"</p>
+
                         <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
                             <button type="button" onclick="navigateTo('kalkulator')" class="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-xl shadow-brand-600/30 hover:shadow-brand-600/40 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-3">
                                 <i class="fa-solid fa-calculator text-lg"></i> Hitung Potensi Limbah
@@ -364,8 +366,8 @@
                             </div>
                             <span class="text-2xl font-black text-brand-600 bg-brand-50 px-3 py-0.5 rounded-xl border border-brand-200">03</span>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-900 mb-2">Pengolahan Agri Hub</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed">Agri Hub memproses limbah menjadi briket, pelet biomassa, atau produk pencacahan siap pakai dengan kontrol kualitas ketat.</p>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Pengolahan & Karbonisasi Agri Hub</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">Agri Hub memproses limbah menjadi briket, pelet biomassa, biochar melalui proses karbonisasi terkendali, atau produk pencacahan siap pakai dengan kontrol kualitas ketat.</p>
                     </div>
                     <div class="mt-6 pt-4 border-t border-slate-100 flex items-center text-xs font-bold text-brand-600">
                         <span>Standardisasi & Densitas</span>
@@ -507,6 +509,39 @@
                     </div>
 
                     <button type="button" onclick="selectWasteType('Cangkang Sawit')" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-brand-600 text-white font-bold text-xs transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-calculator"></i> Hitung Potensi Ekonomi
+                    </button>
+                </div>
+
+                <!-- Item 4: Biochar Karbonisasi -->
+                <div class="catalog-card bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300" data-category="padi">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold">Karbonisasi</span>
+                        <span class="text-xs font-semibold text-slate-500"><i class="fa-solid fa-boxes-stacked mr-1"></i>Min. 3.000 Kg</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-1">Biochar Hasil Karbonisasi Sekam</h3>
+                    <p class="text-slate-500 text-xs mb-6">Hasil proses karbonisasi terkendali sekam padi, cocok untuk pembenah tanah & industri.</p>
+
+                    <div class="space-y-2.5 bg-slate-50 p-4 rounded-2xl mb-6 text-xs sm:text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Kandungan Karbon:</span>
+                            <span class="font-bold text-slate-800">&ge; 60 %</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Kadar Air (Moisture):</span>
+                            <span class="font-bold text-slate-800">&le; 8 %</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">pH:</span>
+                            <span class="font-bold text-slate-800">7 - 9 (Basa Ringan)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Bentuk Fisik:</span>
+                            <span class="font-bold text-brand-600">Serbuk / Granul Biochar</span>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="selectWasteType('Biochar Karbonisasi Sekam')" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-brand-600 text-white font-bold text-xs transition-colors flex items-center justify-center gap-2">
                         <i class="fa-solid fa-calculator"></i> Hitung Potensi Ekonomi
                     </button>
                 </div>
@@ -696,7 +731,7 @@
                                 <p id="res-logistic" class="text-sm font-bold text-rose-300 mt-0.5">Rp 0</p>
                             </div>
                             <div class="p-3 rounded-xl bg-brand-950/60 border border-brand-700/50">
-                                <p class="text-brand-300">Poin Kredit Tani:</p>
+                                <p class="text-brand-300">Poin Agri Credit:</p>
                                 <p id="res-points" class="text-sm font-bold text-amber-300 mt-0.5">+0 Poin</p>
                             </div>
                         </div>
@@ -710,6 +745,11 @@
                         <div class="p-3 rounded-xl bg-emerald-800/60 border border-emerald-600/40 flex items-center justify-between text-xs">
                             <span class="text-emerald-100"><i class="fa-solid fa-cloud-arrow-down mr-1"></i>Reduksi CO₂e Offset:</span>
                             <span id="res-carbon" class="font-extrabold text-white text-sm">0.00 Ton</span>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-400/30 flex items-start gap-2.5 text-xs">
+                            <i class="fa-solid fa-wallet text-amber-300 mt-0.5"></i>
+                            <p class="text-brand-100">Poin Agri Credit dapat dicairkan sebagai limit pembiayaan mikro musim tanam berikutnya melalui <strong class="text-white">Program Loyalitas Agri Credit</strong> — bagian dari layanan Manajemen Akun Terdedikasi PadaTani.</p>
                         </div>
                     </div>
 
@@ -766,15 +806,15 @@
                 <div class="bg-white rounded-3xl p-6 border border-slate-200 hover:border-brand-500 hover:shadow-lg transition-all space-y-4">
                     <div class="flex items-center justify-between">
                         <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold"><i class="fa-solid fa-circle text-[8px] mr-1"></i>Kapasitas 60%</span>
-                        <span class="text-xs text-slate-500">Lampung</span>
+                        <span class="text-xs text-slate-500">Sumatera Selatan</span>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900">Agri Hub Lampung Tengah</h3>
-                    <p class="text-xs text-slate-500"><i class="fa-solid fa-location-dot mr-1.5 text-brand-600"></i>Terbanggi Besar, Lampung Tengah</p>
+                    <h3 class="text-xl font-bold text-slate-900">Agri Hub Ogan Ilir</h3>
+                    <p class="text-xs text-slate-500"><i class="fa-solid fa-location-dot mr-1.5 text-brand-600"></i>Ogan Ilir, Sumatera Selatan</p>
                     <div class="pt-2 text-xs space-y-1.5 text-slate-600">
                         <p><strong>Komoditas Utama:</strong> Cangkang Sawit & Sekam Padi</p>
                         <p><strong>Fasilitas:</strong> Weighbridge 50T, Sorter & Screener</p>
                     </div>
-                    <button type="button" onclick="showToast('Menghubungkan ke Admin Agri Hub Lampung...')" class="w-full py-2.5 rounded-xl border border-slate-300 hover:border-brand-600 hover:text-brand-600 text-slate-700 font-bold text-xs transition-colors">
+                    <button type="button" onclick="showToast('Menghubungkan ke Admin Agri Hub Ogan Ilir...')" class="w-full py-2.5 rounded-xl border border-slate-300 hover:border-brand-600 hover:text-brand-600 text-slate-700 font-bold text-xs transition-colors">
                         Hubungi Manager Hub
                     </button>
                 </div>
@@ -793,10 +833,11 @@
                 </div>
 
                 <form id="partnership-form" onsubmit="submitForm(event)" class="space-y-6">
-                    <div class="grid grid-cols-3 gap-3 p-1.5 bg-slate-100 rounded-2xl">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-1.5 bg-slate-100 rounded-2xl">
                         <button type="button" onclick="setRole('Petani / Poktan', this)" class="role-btn active py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-800 shadow-sm transition-all">Petani / Poktan</button>
                         <button type="button" onclick="setRole('Pengelola Agri Hub', this)" class="role-btn py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 transition-all">Pengelola Agri Hub</button>
                         <button type="button" onclick="setRole('Pembeli Industri B2B', this)" class="role-btn py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 transition-all">Pembeli B2B</button>
+                        <button type="button" onclick="setRole('Mitra Lab Sertifikasi', this)" class="role-btn py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 transition-all">Lab Sertifikasi</button>
                     </div>
                     <input type="hidden" id="selected-role" value="Petani / Poktan">
 
@@ -850,6 +891,7 @@
                         </div>
                         <span class="text-xl font-extrabold text-white">Pada<span class="text-brand-500">Tani</span></span>
                     </div>
+                    <p class="text-xs font-bold text-brand-400 italic">"Bersama Tani, Bersama Untung"</p>
                     <p class="text-xs leading-relaxed text-slate-400">
                         Platform integrasi ekosistem limbah agrikultur nasional terpercaya dengan standardisasi Digital Waste Passport.
                     </p>
@@ -1033,7 +1075,7 @@
         // Select Waste Type from Catalog into Calculator
         function selectWasteType(typeName) {
             const selectEl = document.getElementById('calc-type');
-            if (typeName.includes('Sekam')) selectEl.value = 'sekam';
+            if (typeName.includes('Sekam') || typeName.includes('Biochar')) selectEl.value = 'sekam';
             else if (typeName.includes('Jagung')) selectEl.value = 'jagung';
             else if (typeName.includes('Sawit')) selectEl.value = 'sawit';
 
@@ -1127,14 +1169,33 @@
                 return;
             }
 
-            const data = passportData[inputVal] || {
-                commodity: 'Pelet Biomassa Terverifikasi',
-                origin: 'Mitra Poktan Terdaftar',
-                hub: 'Agri Hub Lampung Tengah',
-                moisture: '12.0 % (Kualitas Unggul)',
-                co2: '1.50 Ton CO₂e Offset',
-                date: '26 September 2026'
-            };
+            const data = passportData[inputVal];
+
+            // Hanya ID yang benar-benar terdaftar di database yang diloloskan.
+            // ID acak/tidak terdaftar akan ditolak secara tegas demi menjaga
+            // kredibilitas klaim "Keterlacakan Penuh / Transparansi".
+            if (!data) {
+                details.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+                placeholder.innerHTML = `
+                    <div class="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto text-2xl">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </div>
+                    <h4 class="font-bold text-rose-300">ID Paspor Tidak Ditemukan</h4>
+                    <p class="text-xs text-slate-400 max-w-xs mx-auto">ID "${inputVal}" tidak terdaftar dalam sistem Digital Waste Passport PadaTani. Pastikan ID benar atau hubungi Agri Hub asal muatan.</p>
+                `;
+                showToast(`ID Paspor "${inputVal}" tidak ditemukan / tidak valid.`, 'error');
+                return;
+            }
+
+            // Jika sebelumnya menampilkan pesan error, kembalikan placeholder ke kondisi normal
+            placeholder.innerHTML = `
+                <div class="w-16 h-16 rounded-2xl bg-slate-700/60 border border-slate-600 text-brand-400 flex items-center justify-center mx-auto text-2xl">
+                    <i class="fa-solid fa-qrcode"></i>
+                </div>
+                <h4 class="font-bold text-slate-200">Menunggu Input ID Paspor</h4>
+                <p class="text-xs text-slate-400 max-w-xs mx-auto">Ketik ID paspor di samping atau klik sampel ID di atas untuk melihat rincian sertifikasi batch limbah.</p>
+            `;
 
             document.getElementById('res-id').innerText = inputVal;
             document.getElementById('res-commodity').innerText = data.commodity;
@@ -1182,7 +1243,9 @@
                 } else if (lower.includes('paspor') || lower.includes('digital')) {
                     botReply = "Digital Waste Passport memberikan sertifikasi uji laboratorium kadar air, nilai kalor, serta pelacakan jejak karbon CO2 untuk setiap batch pengiriman.";
                 } else if (lower.includes('daftar') || lower.includes('mitra')) {
-                    botReply = "Anda bisa langsung mendaftar melalui formulir Kemitraan. Pilih peran sebagai Petani, Hub, atau Pembeli B2B!";
+                    botReply = "Anda bisa langsung mendaftar melalui formulir Kemitraan. Pilih peran sebagai Petani, Hub, Pembeli B2B, atau Lab Sertifikasi!";
+                } else if (lower.includes('agri credit') || lower.includes('kredit')) {
+                    botReply = "Agri Credit adalah program loyalitas: setiap transaksi limbah menghasilkan Poin Agri Credit yang bisa dicairkan sebagai limit pembiayaan mikro musim tanam berikutnya.";
                 }
 
                 const botMsgHtml = `
@@ -1205,6 +1268,8 @@
                     navigateTo('paspor-digital');
                 } else if (lower.includes('harga') || lower.includes('sekam')) {
                     navigateTo('katalog');
+                } else if (lower.includes('agri credit') || lower.includes('kredit')) {
+                    navigateTo('kalkulator');
                 }
             }, 600);
         }
